@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import Colors from '../../../src/constants/Colors';
+import Colors from '@/src/constants/Colors';
 import { Star } from 'lucide-react-native';
-import Button from '../../../src/components/ui/Button';
-import Input from '../../../src/components/ui/Input';
+import Button from '@/src/components/ui/Button';
+import Input from '@/src/components/ui/Input';
 
 const TAGS = ['Sabar', 'Jelas', 'Tepat Waktu', 'Ramah', 'Seru'];
 

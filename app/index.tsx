@@ -1,5 +1,5 @@
 import { Redirect } from "expo-router";
-import { useAuthStore } from "../src/store/useAuthStore";
+import { useAuthStore } from "@/src/store/useAuthStore";
 
 // Main gateway that decides where the user should be routed initially
 export default function Index() {
@@ -7,7 +7,7 @@ export default function Index() {
   const role = useAuthStore((state) => state.role);
 
   if (!isAuthenticated) {
-    return <Redirect href="/(auth)/login" />;
+    return <Redirect href="/(auth)/welcome" />;
   }
 
   if (role === "teacher") {

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import Colors from '../../../src/constants/Colors';
+import Colors from '@/src/constants/Colors';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react-native';
-import Button from '../../../src/components/ui/Button';
+import Button from '@/src/components/ui/Button';
 
 const SUBJECTS = ['Matematika', 'Fisika', 'Kimia', 'Biologi', 'Bahasa Inggris', 'Bahasa Indonesia'];
 const LEVELS = ['SD', 'SMP', 'SMA'];

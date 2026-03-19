@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import Colors from '../../../src/constants/Colors';
+import Colors from '@/src/constants/Colors';
 import { Map, MapPin, Phone, MessageCircle } from 'lucide-react-native';
-import Button from '../../../src/components/ui/Button';
+import Button from '@/src/components/ui/Button';
 
 export default function Tracking() {
   const router = useRouter();

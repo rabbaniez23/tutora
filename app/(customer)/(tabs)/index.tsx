@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Image, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import Colors from '../../../src/constants/Colors';
+import Colors from '@/src/constants/Colors';
 import { Wallet, Search, Bell, MessageCircle, PlusCircle, Clock, GraduationCap, Sigma, FlaskConical, Microscope, Globe, ScrollText, BookOpen, Palette, MoreHorizontal } from 'lucide-react-native';
 
 const SERVICES = [
@@ -25,12 +25,12 @@ export default function CustomerHome() {
         
         {/* Blue Header Section */}
         <View style={styles.headerBackground}>
-          {Platform.OS === 'ios' && <View style={{ height: 50 }} />} {/* Native Safe Area Top */}
+          {Platform.OS === 'ios' && <View style={{ height: 50 }} />}
           <View style={styles.topNav}>
             <View style={styles.profileSection}>
               {/* Gunakan require() untuk asset lokal bundler */}
               <Image 
-                source={require('../../../assets/delia.webp')} 
+                source={require('@/assets/delia.webp')} 
                 style={styles.avatar} 
               />
               <View style={styles.greetingText}>
@@ -43,7 +43,7 @@ export default function CustomerHome() {
               <TouchableOpacity style={styles.iconCircle}>
                 <Bell size={20} color="#FFF" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.iconCircle}>
+              <TouchableOpacity style={styles.iconCircle} onPress={() => router.push('/(customer)/(tabs)/chat')}>
                 <MessageCircle size={20} color="#FFF" />
               </TouchableOpacity>
             </View>

@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from 'expo-router';
-import { useAuthStore } from "../../../src/store/useAuthStore";
-import Colors from "../../../src/constants/Colors";
+import { useAuthStore } from "@/src/store/useAuthStore";
+import Colors from "@/src/constants/Colors";
 import { LogOut } from "lucide-react-native";
 
 export default function TeacherProfile() {

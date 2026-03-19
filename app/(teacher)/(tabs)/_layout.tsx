@@ -1,6 +1,7 @@
 import { Tabs } from "expo-router";
+import { Platform } from "react-native";
 import { LayoutDashboard, Wallet, User as UserIcon } from "lucide-react-native";
-import Colors from "../../../src/constants/Colors";
+import Colors from "@/src/constants/Colors";
 
 export default function TeacherTabsLayout() {
   return (
@@ -12,9 +13,9 @@ export default function TeacherTabsLayout() {
         tabBarStyle: {
           borderTopWidth: 1,
           borderTopColor: Colors.border,
-          height: 60,
-          paddingBottom: 8,
           paddingTop: 8,
+          paddingBottom: Platform.OS === 'ios' ? 24 : 12,
+          height: Platform.OS === 'ios' ? 85 : 70,
         },
       }}
     >

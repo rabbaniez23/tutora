@@ -9,7 +9,7 @@ import {
 import Colors from "../../constants/Colors";
 
 interface InputProps extends TextInputProps {
-  label: string;
+  label?: string;
   error?: string;
 }
 

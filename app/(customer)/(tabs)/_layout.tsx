@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Home, Tag, ClipboardList, User } from 'lucide-react-native';
-import Colors from '../../../src/constants/Colors';
+import { Platform } from 'react-native';
+import Colors from '@/src/constants/Colors';
 
 export default function CustomerTabsLayout() {
   return (
@@ -12,9 +13,9 @@ export default function CustomerTabsLayout() {
         tabBarStyle: {
           borderTopWidth: 1,
           borderTopColor: Colors.border,
-          height: 60,
-          paddingBottom: 8,
           paddingTop: 8,
+          paddingBottom: Platform.OS === 'ios' ? 24 : 12,
+          height: Platform.OS === 'ios' ? 85 : 70,
         },
       }}
     >
@@ -44,6 +45,13 @@ export default function CustomerTabsLayout() {
         options={{
           title: 'Profil',
           tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
+        }}
+      />
+      {/* Hide the chat file from bottom tabs but allow navigation to it */}
+      <Tabs.Screen
+        name="chat"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

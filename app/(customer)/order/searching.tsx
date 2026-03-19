@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Animated, Easing } from 'react-native';
 import { useRouter } from 'expo-router';
-import Colors from '../../../src/constants/Colors';
+import Colors from '@/src/constants/Colors';
 import { Search } from 'lucide-react-native';
-import Button from '../../../src/components/ui/Button';
+import Button from '@/src/components/ui/Button';
 
 export default function SearchingRadar() {
   const router = useRouter();

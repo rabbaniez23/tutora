@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
-import Colors from '../../../src/constants/Colors';
+import Colors from '@/src/constants/Colors';
 import { MapPin, Briefcase } from 'lucide-react-native';
-import Button from '../../../src/components/ui/Button';
+import Button from '@/src/components/ui/Button';
 
 export default function IncomingJob() {
   const router = useRouter();

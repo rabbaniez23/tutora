@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import Colors from "../../../src/constants/Colors";
+import Colors from "@/src/constants/Colors";
 import { ChevronRight } from "lucide-react-native";
 import { useRouter } from 'expo-router';
-import { useAuthStore } from "../../../src/store/useAuthStore";
+import { useAuthStore } from "@/src/store/useAuthStore";
 
 export default function CustomerProfile() {
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function CustomerProfile() {
         <View style={styles.headerProfile}>
           <View style={styles.avatarPlaceholder}>
              <Image 
-                source={require('../../../../assets/delia.webp')} 
+                source={require('@/assets/delia.webp')} 
                 style={styles.avatarImage} 
               />
           </View>

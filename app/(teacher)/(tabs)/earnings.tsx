@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from "react-native";
-import Colors from "../../../src/constants/Colors";
+import Colors from "@/src/constants/Colors";
 
 export default function TeacherEarnings() {
   return (

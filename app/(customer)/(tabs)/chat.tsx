@@ -7,7 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import Colors from "../../../src/constants/Colors";
+import Colors from "@/src/constants/Colors";
 import { MessageCircle } from "lucide-react-native";
 
 const CHATS = [
