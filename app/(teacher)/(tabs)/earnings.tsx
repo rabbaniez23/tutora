@@ -1,8 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from "react-native";
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 import Colors from "@/src/constants/Colors";
 
 export default function TeacherEarnings() {
+  const router = useRouter();
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -12,9 +15,9 @@ export default function TeacherEarnings() {
         <View style={styles.balanceCard}>
           <Text style={styles.balanceLabel}>Saldo Dompet Tutor</Text>
           <Text style={styles.balanceAmount}>Rp 450.000</Text>
-          <View style={styles.withdrawBtn}>
+          <TouchableOpacity style={styles.withdrawBtn} onPress={() => router.push('/(teacher)/payment/withdraw')}>
             <Text style={styles.withdrawText}>Tarik Saldo</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.historyTitle}>Riwayat Transaksi</Text>

@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import { Platform } from "react-native";
-import { LayoutDashboard, Wallet, User as UserIcon } from "lucide-react-native";
+import { LayoutDashboard, ClipboardList, Wallet, User as UserIcon } from "lucide-react-native";
 import Colors from "@/src/constants/Colors";
 
 export default function TeacherTabsLayout() {
@@ -25,6 +25,15 @@ export default function TeacherTabsLayout() {
           title: "Dashboard",
           tabBarIcon: ({ color, size }) => (
             <LayoutDashboard size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: "Riwayat",
+          tabBarIcon: ({ color, size }) => (
+            <ClipboardList size={size} color={color} />
           ),
         }}
       />

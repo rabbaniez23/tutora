@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
-import { ArrowLeft, Wallet, RotateCcw, MessageSquare } from 'lucide-react-native';
+import { ArrowLeft, Wallet, RotateCcw, MessageSquare, Star } from 'lucide-react-native';
 
 const TABS = ['Dalam Proses', 'Terjadwal', 'Riwayat'];
 const FILTERS = ['Semua Pelajaran', 'Bulan Ini', 'Matematika', 'Fisika'];
 
 export default function ActivityScreen() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('Riwayat');
   const [activeFilter, setActiveFilter] = useState('Semua Pelajaran');
 
@@ -15,15 +18,15 @@ export default function ActivityScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <TouchableOpacity style={styles.backBtn}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
             <ArrowLeft size={24} color="#0A1E3F" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Aktivitas</Text>
         </View>
-        <View style={styles.balanceChip}>
+        <TouchableOpacity style={styles.balanceChip} onPress={() => router.push('/(customer)/payment')}>
           <Wallet size={14} color="#2E3B7D" />
           <Text style={styles.balanceText}>Rp 125.000</Text>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Tabs */}
@@ -61,7 +64,7 @@ export default function ActivityScreen() {
 
         {/* Card 1 */}
         <View style={styles.card}>
-          <View style={styles.cardTop}>
+          <TouchableOpacity style={styles.cardTop} onPress={() => router.push('/(customer)/teacher/1')}>
             <Image source={{ uri: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100' }} style={styles.avatar} />
             <View style={styles.cardInfo}>
               <View style={styles.titleRow}>
@@ -73,22 +76,22 @@ export default function ActivityScreen() {
               <Text style={styles.tutorName}>Budi Santoso</Text>
               <Text style={styles.dateTime}>🗓️ 12 Okt 2023 • 15:00</Text>
             </View>
-          </View>
+          </TouchableOpacity>
           <View style={styles.cardBottom}>
             <View style={styles.priceCol}>
               <Text style={styles.priceLabel}>Total Biaya</Text>
               <Text style={styles.priceValue}>Rp 150.000</Text>
             </View>
-            <TouchableOpacity style={styles.actionBtn}>
-              <RotateCcw size={16} color="#FFF" style={{ marginRight: 6 }} />
-              <Text style={styles.actionBtnText}>Pesan Lagi</Text>
+            <TouchableOpacity style={styles.actionBtn} onPress={() => router.push('/(customer)/order/review?teacherId=1')}>
+              <Star size={16} color="#FFF" style={{ marginRight: 6 }} />
+              <Text style={styles.actionBtnText}>Beri Ulasan</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Card 2 */}
         <View style={styles.card}>
-          <View style={styles.cardTop}>
+          <TouchableOpacity style={styles.cardTop} onPress={() => router.push('/(customer)/teacher/2')}>
             <Image source={{ uri: 'https://images.unsplash.com/photo-1580894732444-8ecded790047?auto=format&fit=crop&q=80&w=100&h=100' }} style={styles.avatar} />
             <View style={styles.cardInfo}>
               <View style={styles.titleRow}>
@@ -100,7 +103,7 @@ export default function ActivityScreen() {
               <Text style={styles.tutorName}>Sari Wijaya</Text>
               <Text style={styles.dateTime}>🗓️ 08 Okt 2023 • 10:00</Text>
             </View>
-          </View>
+          </TouchableOpacity>
           <View style={styles.cardBottom}>
             <View style={styles.priceCol}>
               <Text style={styles.priceLabel}>Total Biaya</Text>
@@ -118,7 +121,7 @@ export default function ActivityScreen() {
 
         {/* Card 3 (Cancelled) */}
         <View style={styles.card}>
-          <View style={styles.cardTop}>
+          <TouchableOpacity style={styles.cardTop} onPress={() => router.push('/(customer)/teacher/3')}>
             <Image source={{ uri: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=100&h=100' }} style={styles.avatar} />
             <View style={styles.cardInfo}>
               <View style={styles.titleRow}>
@@ -130,7 +133,7 @@ export default function ActivityScreen() {
               <Text style={styles.tutorName}>Andi Pratama</Text>
               <Text style={styles.dateTime}>🗓️ 25 Sep 2023 • 19:00</Text>
             </View>
-          </View>
+          </TouchableOpacity>
           <View style={styles.cardBottom}>
             <View style={styles.priceCol}>
               <Text style={styles.priceLabel}>Total Biaya</Text>

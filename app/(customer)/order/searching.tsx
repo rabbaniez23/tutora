@@ -1,5 +1,6 @@
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { Search } from 'lucide-react-native';

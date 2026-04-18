@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Image, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { Wallet, Search, Bell, MessageCircle, PlusCircle, Clock, GraduationCap, Sigma, FlaskConical, Microscope, Globe, ScrollText, BookOpen, Palette, MoreHorizontal } from 'lucide-react-native';
@@ -40,7 +41,7 @@ export default function CustomerHome() {
             </View>
             
             <View style={styles.navActions}>
-              <TouchableOpacity style={styles.iconCircle}>
+              <TouchableOpacity style={styles.iconCircle} onPress={() => router.push('/(customer)/notifications')}>
                 <Bell size={20} color="#FFF" />
               </TouchableOpacity>
               <TouchableOpacity style={styles.iconCircle} onPress={() => router.push('/(customer)/(tabs)/chat')}>

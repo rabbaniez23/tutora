@@ -1,16 +1,21 @@
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { Star } from 'lucide-react-native';
 import Button from '@/src/components/ui/Button';
 import Input from '@/src/components/ui/Input';
+import { useReviewStore } from '@/src/store/useReviewStore';
 
 const TAGS = ['Sabar', 'Jelas', 'Tepat Waktu', 'Ramah', 'Seru'];
 
 export default function ReviewScreen() {
   const router = useRouter();
-  const [rating, setRating] = useState(0);
+  const { teacherId } = useLocalSearchParams();
+  const addReview = useReviewStore((state) => state.addReview);
+  
+  const [rating, setRating] = useState(5);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [review, setReview] = useState('');
 
@@ -23,12 +28,25 @@ export default function ReviewScreen() {
   };
 
   const submitReview = () => {
-    router.replace('/(customer)/(tabs)');
+    addReview({
+      id: Math.random().toString(),
+      teacherId: (teacherId as string) || "1",
+      author: "Delia Puspitasari", // Current logged in user ideally
+      rating,
+      content: review,
+      tags: selectedTags
+    });
+    router.replace(`/(customer)/teacher/${(teacherId as string) || "1"}` as any);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView 
+        contentContainerStyle={styles.content} 
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="none"
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.receipt}>
           <Text style={styles.receiptTitle}>Total Pembayaran</Text>
           <Text style={styles.receiptAmount}>Rp 150.000</Text>
@@ -50,38 +68,35 @@ export default function ReviewScreen() {
           ))}
         </View>
 
-        {rating > 0 && (
-          <View style={styles.feedbackSection}>
-            <Text style={styles.label}>Pilih Tag Penilaian:</Text>
-            <View style={styles.tagsContainer}>
-              {TAGS.map(tag => (
-                <TouchableOpacity 
-                  key={tag} 
-                  style={[styles.tag, selectedTags.includes(tag) && styles.tagSelected]}
-                  onPress={() => toggleTag(tag)}
-                >
-                  <Text style={[styles.tagText, selectedTags.includes(tag) && styles.tagTextSelected]}>{tag}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <Input 
-              label="Komentar Tambahan"
-              placeholder="Guru sangat asik dan jelas dalam mengajar..."
-              multiline
-              numberOfLines={4}
-              style={styles.textArea}
-              value={review}
-              onChangeText={setReview}
-            />
+        <View style={styles.feedbackSection}>
+          <Text style={styles.label}>Pilih Tag Penilaian:</Text>
+          <View style={styles.tagsContainer}>
+            {TAGS.map(tag => (
+              <TouchableOpacity 
+                key={tag} 
+                style={[styles.tag, selectedTags.includes(tag) && styles.tagSelected]}
+                onPress={() => toggleTag(tag)}
+              >
+                <Text style={[styles.tagText, selectedTags.includes(tag) && styles.tagTextSelected]}>{tag}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
-        )}
+
+          <Input 
+            label="Komentar Tambahan"
+            placeholder="Guru sangat asik dan jelas dalam mengajar..."
+            multiline
+            numberOfLines={4}
+            style={styles.textArea}
+            value={review}
+            onChangeText={setReview}
+          />
+        </View>
       </ScrollView>
 
       <View style={styles.footer}>
         <Button 
           title="Kirim Ulasan" 
-          disabled={rating === 0}
           onPress={submitReview} 
         />
       </View>

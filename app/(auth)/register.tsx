@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, User, Mail, Lock, Eye, EyeOff, BookOpen, GraduationCap, CheckCircle } from 'lucide-react-native';
-import Input from '@/src/components/ui/Input';
-import Button from '@/src/components/ui/Button';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -15,8 +14,8 @@ export default function RegisterScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={24} color={Colors.text} />
+        <TouchableOpacity onPress={() => router.replace('/(auth)/welcome')} style={styles.backBtn}>
+          <ArrowLeft size={24} color="#0A1E3F" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Daftar Tutura</Text>
         <View style={{ width: 24 }} />
@@ -44,26 +43,38 @@ export default function RegisterScreen() {
         {/* Form */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Nama Lengkap</Text>
-          <View style={styles.inputWrapper}>
-            <User size={20} color={Colors.textMuted} style={styles.inputIcon} />
-            <Input placeholder="Contoh: Delia puspitasari" style={styles.input} />
+          <View style={styles.inputRow}>
+            <User size={20} color={Colors.textMuted} style={styles.iconSpaced} />
+            <TextInput 
+              placeholder="Contoh: Delia Puspitasari" 
+              placeholderTextColor={Colors.textMuted}
+              style={styles.inputText}
+            />
           </View>
         </View>
 
         <View style={styles.formGroup}>
           <Text style={styles.label}>Alamat Email</Text>
-          <View style={styles.inputWrapper}>
-            <Mail size={20} color={Colors.textMuted} style={styles.inputIcon} />
-            <Input placeholder="Delia.puspitasari@email.com" style={styles.input} />
+          <View style={styles.inputRow}>
+            <Mail size={20} color={Colors.textMuted} style={styles.iconSpaced} />
+            <TextInput 
+              placeholder="Delia.puspitasari@email.com" 
+              placeholderTextColor={Colors.textMuted}
+              style={styles.inputText}
+            />
           </View>
         </View>
 
         <View style={styles.formGroup}>
           <Text style={styles.label}>Nomor Telepon</Text>
-          <View style={[styles.inputWrapper, { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', borderWidth: 1, borderColor: Colors.border, borderRadius: 24 }]}>
+          <View style={styles.inputRowPhone}>
             <Text style={styles.phonePrefix}>+62</Text>
             <View style={styles.phoneDivider} />
-            <Input placeholder="812 3456 7890" style={[styles.input, { borderWidth: 0, flex: 1, paddingLeft: 12, backgroundColor: 'transparent' }]} />
+            <TextInput 
+              placeholder="812 3456 7890" 
+              placeholderTextColor={Colors.textMuted}
+              style={styles.inputText} 
+            />
           </View>
         </View>
 
@@ -92,14 +103,15 @@ export default function RegisterScreen() {
         {/* Password */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Kata Sandi</Text>
-          <View style={styles.inputWrapper}>
-            <Lock size={20} color={Colors.textMuted} style={styles.inputIcon} />
-            <Input 
+          <View style={styles.inputRow}>
+            <Lock size={20} color={Colors.textMuted} style={styles.iconSpaced} />
+            <TextInput 
               placeholder="••••••••" 
+              placeholderTextColor={Colors.textMuted}
               secureTextEntry={!showPassword}
-              style={styles.input}
+              style={styles.inputText}
             />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.iconHover}>
               {showPassword ? <EyeOff size={20} color={Colors.textMuted} /> : <Eye size={20} color={Colors.textMuted} />}
             </TouchableOpacity>
           </View>
@@ -115,17 +127,18 @@ export default function RegisterScreen() {
         </TouchableOpacity>
 
         {/* Action */}
-        <Button 
-          title="Daftar Sekarang ➔" 
-          disabled={!agreed}
-          style={[styles.registerBtn, !agreed && { opacity: 0.5 }]}
+        <TouchableOpacity 
+          style={[styles.registerBtn, !agreed && { opacity: 0.5 }]} 
           onPress={() => router.replace('/(auth)/login')}
-        />
+          disabled={!agreed}
+        >
+          <Text style={styles.registerBtnText}>Daftar Sekarang ➔</Text>
+        </TouchableOpacity>
 
         {/* Footer */}
         <View style={styles.footerContainer}>
           <Text style={styles.footerText}>Sudah punya akun? </Text>
-          <TouchableOpacity onPress={() => router.replace('/(auth)/login')}>
+          <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
             <Text style={styles.boldBlue}>Masuk di sini</Text>
           </TouchableOpacity>
         </View>
@@ -139,44 +152,64 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FAFAFA' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 },
   backBtn: { padding: 4 },
-  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#000' },
+  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#0A1E3F' },
 
   scrollContent: { padding: 24, paddingBottom: 40 },
   
   progressContainer: { marginBottom: 32 },
   progressTextRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  progressText: { fontSize: 12, color: Colors.textMuted, fontWeight: 'bold' },
+  progressText: { fontSize: 12, color: '#7A8C9E', fontWeight: 'bold' },
   progressTextGreen: { fontSize: 12, color: Colors.secondary, fontWeight: 'bold' },
-  progressBarBg: { height: 6, backgroundColor: '#E0E0E0', borderRadius: 3 },
+  progressBarBg: { height: 6, backgroundColor: '#E2E8F0', borderRadius: 3 },
   progressBarFill: { height: 6, backgroundColor: Colors.primary, borderRadius: 3, width: '50%' },
 
   titleSection: { marginBottom: 24 },
-  title: { fontSize: 28, fontWeight: 'bold', color: '#0A1E3F', marginBottom: 8 },
-  subtitle: { fontSize: 14, color: '#4A5A75', lineHeight: 22 },
+  title: { fontSize: 26, fontWeight: 'bold', color: '#0A1E3F', marginBottom: 8 },
+  subtitle: { fontSize: 13, color: '#4A5A75', lineHeight: 22 },
 
   formGroup: { marginBottom: 16 },
   label: { fontSize: 13, fontWeight: 'bold', color: '#0A1E3F', marginBottom: 8 },
-  inputWrapper: { position: 'relative' },
-  inputIcon: { position: 'absolute', left: 16, top: 14, zIndex: 1 },
-  eyeIcon: { position: 'absolute', right: 16, top: 14, zIndex: 1 },
-  input: { paddingLeft: 48, backgroundColor: '#FFF', borderWidth: 1, borderColor: Colors.border, borderRadius: 24 },
   
-  phonePrefix: { paddingLeft: 16, fontSize: 14, fontWeight: 'bold', color: Colors.text },
-  phoneDivider: { width: 1, height: 20, backgroundColor: Colors.border, marginHorizontal: 12 },
-  helperText: { fontSize: 11, color: Colors.textMuted, marginTop: 8 },
+  inputRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#FFF', 
+    borderWidth: 1, 
+    borderColor: '#E2E8F0', 
+    borderRadius: 24, 
+    paddingHorizontal: 16, 
+    height: 52 
+  },
+  inputRowPhone: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#FFF', 
+    borderWidth: 1, 
+    borderColor: '#E2E8F0', 
+    borderRadius: 24, 
+    height: 52 
+  },
+  iconSpaced: { marginRight: 12 },
+  iconHover: { padding: 4 },
+  inputText: { flex: 1, fontSize: 14, color: '#0A1E3F', height: '100%' },
+  
+  phonePrefix: { paddingLeft: 16, fontSize: 14, fontWeight: 'bold', color: '#0A1E3F' },
+  phoneDivider: { width: 1, height: 20, backgroundColor: '#E2E8F0', marginHorizontal: 12 },
+  helperText: { fontSize: 11, color: '#7A8C9E', marginTop: 8 },
 
   roleGrid: { flexDirection: 'row', gap: 16 },
-  roleCard: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 20, backgroundColor: '#FFF', borderWidth: 1, borderColor: Colors.border, borderRadius: 20 },
-  roleCardActive: { borderColor: Colors.secondary, backgroundColor: Colors.lightGreen },
-  roleText: { marginTop: 8, fontSize: 14, fontWeight: 'bold', color: Colors.textMuted },
+  roleCard: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 20, backgroundColor: '#FFF', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 20 },
+  roleCardActive: { borderColor: Colors.secondary, backgroundColor: '#E8F6ED' },
+  roleText: { marginTop: 8, fontSize: 14, fontWeight: 'bold', color: '#7A8C9E' },
   roleTextActiveGreen: { color: Colors.secondary },
 
-  agreementBox: { flexDirection: 'row', backgroundColor: Colors.surface, padding: 16, borderRadius: 12, marginBottom: 24, alignItems: 'center' },
-  agreementText: { flex: 1, marginLeft: 12, fontSize: 12, color: Colors.text, lineHeight: 18 },
+  agreementBox: { flexDirection: 'row', backgroundColor: '#F0F2F5', padding: 16, borderRadius: 12, marginBottom: 24, alignItems: 'center' },
+  agreementText: { flex: 1, marginLeft: 12, fontSize: 12, color: '#4A5A75', lineHeight: 18 },
   boldBlue: { fontWeight: 'bold', color: Colors.primary },
 
-  registerBtn: { backgroundColor: Colors.secondary, borderRadius: 30, paddingVertical: 18 },
+  registerBtn: { backgroundColor: Colors.secondary, borderRadius: 30, paddingVertical: 18, alignItems: 'center' },
+  registerBtnText: { color: '#FFF', fontSize: 14, fontWeight: 'bold' },
   
   footerContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 32 },
-  footerText: { fontSize: 14, color: Colors.textMuted }
+  footerText: { fontSize: 14, color: '#7A8C9E' }
 });
