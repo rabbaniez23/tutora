@@ -5,9 +5,19 @@ import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { Bell, BarChart2, Map, BookOpen, Globe } from 'lucide-react-native';
 
+import { MapView, Marker } from '@/src/components/MapComponent';
+
 export default function TeacherHome() {
   const router = useRouter();
   const [isOnline, setIsOnline] = useState(true);
+
+  // Default coordinate for Jakarta Selatan Heatmap
+  const region = {
+    latitude: -6.2250, 
+    longitude: 106.8166,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -44,6 +54,15 @@ export default function TeacherHome() {
             thumbColor={'#FFF'}
             style={{ transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }], marginTop: 8 }}
           />
+
+          {isOnline && (
+            <TouchableOpacity 
+              style={{ marginTop: 24, paddingVertical: 12, paddingHorizontal: 20, backgroundColor: '#E8F6ED', borderRadius: 20, borderWidth: 1, borderColor: Colors.secondary }}
+              onPress={() => router.push('/(teacher)/job/incoming')}
+            >
+              <Text style={{ color: Colors.secondary, fontWeight: 'bold' }}>[Simulasi] Masuk Order Baru</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Today's Summary */}
@@ -84,12 +103,16 @@ export default function TeacherHome() {
         </View>
 
         <View style={styles.mapContainer}>
-          {/* Mock Map Image */}
-          <Image 
-            source={{ uri: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=600&h=300' }} 
+          {/* Peta nyata dari MapComponent yg tidak bergantung API Key */}
+          <MapView 
             style={styles.mapImage}
-            blurRadius={2}
-          />
+            region={region}
+          >
+             <Marker region={region}>
+               <View style={styles.tutorDot} />
+             </Marker>
+          </MapView>
+          
           <View style={styles.mapOverlay}>
             <View style={styles.highDemandChip}>
               <View style={styles.greenDot} />
@@ -194,6 +217,7 @@ const styles = StyleSheet.create({
   highDemandChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, shadowColor: '#000', shadowOffset: { width:0, height:2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
   greenDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.secondary, marginRight: 6 },
   highDemandText: { fontSize: 11, fontWeight: 'bold', color: '#0A1E3F' },
+  tutorDot: { width: 14, height: 14, borderRadius: 7, backgroundColor: Colors.primary, borderWidth: 2, borderColor: '#FFF' },
 
   viewAllText: { fontSize: 14, fontWeight: 'bold', color: '#1f4e8c' },
 

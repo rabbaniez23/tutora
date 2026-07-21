@@ -1,15 +1,29 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
-import { ArrowLeft, User, Mail, Lock, Eye, EyeOff, BookOpen, GraduationCap, CheckCircle } from 'lucide-react-native';
+import { ArrowLeft, User, Mail, Lock, Eye, EyeOff, BookOpen, GraduationCap, CheckCircle, Camera, X } from 'lucide-react-native';
+import { TERMS_AND_CONDITIONS, PRIVACY_POLICY } from '@/src/constants/Terms';
 
 export default function RegisterScreen() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<'customer' | 'teacher'>('customer');
+  const [role, setRole] = useState<'customer' | 'teacher' | 'parent'>('customer');
   const [agreed, setAgreed] = useState(false);
+  
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: '', body: '' });
+
+  const openTerms = () => {
+    setModalContent({ title: 'Ketentuan Layanan', body: TERMS_AND_CONDITIONS });
+    setModalVisible(true);
+  };
+
+  const openPrivacy = () => {
+    setModalContent({ title: 'Kebijakan Privasi', body: PRIVACY_POLICY });
+    setModalVisible(true);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -86,7 +100,7 @@ export default function RegisterScreen() {
               style={[styles.roleCard, role === 'customer' && styles.roleCardActive]}
               onPress={() => setRole('customer')}
             >
-              <GraduationCap size={32} color={role === 'customer' ? Colors.secondary : Colors.textMuted} />
+              <GraduationCap size={24} color={role === 'customer' ? Colors.secondary : Colors.textMuted} />
               <Text style={[styles.roleText, role === 'customer' && styles.roleTextActiveGreen]}>Siswa</Text>
             </TouchableOpacity>
             
@@ -94,11 +108,86 @@ export default function RegisterScreen() {
               style={[styles.roleCard, role === 'teacher' && styles.roleCardActive]}
               onPress={() => setRole('teacher')}
             >
-              <BookOpen size={32} color={role === 'teacher' ? Colors.secondary : Colors.textMuted} />
+              <BookOpen size={24} color={role === 'teacher' ? Colors.secondary : Colors.textMuted} />
               <Text style={[styles.roleText, role === 'teacher' && styles.roleTextActiveGreen]}>Tutor</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.roleCard, role === 'parent' && styles.roleCardActive]}
+              onPress={() => setRole('parent')}
+            >
+              <User size={24} color={role === 'parent' ? Colors.secondary : Colors.textMuted} />
+              <Text style={[styles.roleText, role === 'parent' && styles.roleTextActiveGreen]}>Orang Tua</Text>
             </TouchableOpacity>
           </View>
         </View>
+
+        {role === 'teacher' && (
+          <View style={styles.teacherExtraFields}>
+            <Text style={[styles.title, { fontSize: 18, marginBottom: 16 }]}>Data Tambahan Tutor</Text>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>NIK</Text>
+              <View style={styles.inputRow}>
+                <TextInput placeholder="16 digit NIK" keyboardType="numeric" placeholderTextColor={Colors.textMuted} style={styles.inputText} />
+              </View>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Foto KTP</Text>
+              <TouchableOpacity style={styles.uploadBox}>
+                <Camera size={24} color={Colors.textMuted} />
+                <Text style={styles.uploadText}>Unggah Foto KTP</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Universitas</Text>
+              <View style={styles.inputRow}>
+                <GraduationCap size={20} color={Colors.textMuted} style={styles.iconSpaced} />
+                <TextInput placeholder="Nama Universitas" placeholderTextColor={Colors.textMuted} style={styles.inputText} />
+              </View>
+            </View>
+
+            <View style={styles.rowForm}>
+              <View style={[styles.formGroup, { flex: 1 }]}>
+                <Text style={styles.label}>Jurusan</Text>
+                <View style={styles.inputRow}>
+                  <TextInput placeholder="Nama Jurusan" placeholderTextColor={Colors.textMuted} style={styles.inputText} />
+                </View>
+              </View>
+              <View style={[styles.formGroup, { flex: 0.8, marginLeft: 12 }]}>
+                <Text style={styles.label}>Tahun Angkatan</Text>
+                <View style={styles.inputRow}>
+                  <TextInput placeholder="2015" keyboardType="numeric" placeholderTextColor={Colors.textMuted} style={styles.inputText} />
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>IPK (Jika Mahasiswa)</Text>
+              <View style={styles.inputRow}>
+                <TextInput placeholder="3.85" keyboardType="numeric" placeholderTextColor={Colors.textMuted} style={styles.inputText} />
+              </View>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Mata Pelajaran</Text>
+              <View style={styles.inputRow}>
+                <BookOpen size={20} color={Colors.textMuted} style={styles.iconSpaced} />
+                <TextInput placeholder="Cth: Matematika SMA" placeholderTextColor={Colors.textMuted} style={styles.inputText} />
+              </View>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Foto Profil</Text>
+              <TouchableOpacity style={[styles.uploadBox, { height: 80 }]}>
+                <Camera size={24} color={Colors.textMuted} />
+                <Text style={styles.uploadText}>Unggah Foto Profil</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
 
         {/* Password */}
         <View style={styles.formGroup}>
@@ -119,17 +208,25 @@ export default function RegisterScreen() {
         </View>
 
         {/* Agreement */}
-        <TouchableOpacity style={styles.agreementBox} onPress={() => setAgreed(!agreed)}>
-          <CheckCircle size={24} color={agreed ? Colors.secondary : Colors.textMuted} />
+        <View style={styles.agreementOuter}>
+          <TouchableOpacity onPress={() => setAgreed(!agreed)} style={styles.checkboxTouch}>
+            <CheckCircle size={24} color={agreed ? Colors.secondary : Colors.textMuted} />
+          </TouchableOpacity>
           <Text style={styles.agreementText}>
-            Dengan mendaftar, Anda menyetujui <Text style={styles.boldBlue}>Ketentuan Layanan</Text> dan <Text style={styles.boldBlue}>Kebijakan Privasi</Text> Tutura.
+            Dengan mendaftar, Anda menyetujui <Text style={styles.boldBlue} onPress={openTerms}>Ketentuan Layanan</Text> dan <Text style={styles.boldBlue} onPress={openPrivacy}>Kebijakan Privasi</Text> Tutura.
           </Text>
-        </TouchableOpacity>
+        </View>
 
         {/* Action */}
         <TouchableOpacity 
           style={[styles.registerBtn, !agreed && { opacity: 0.5 }]} 
-          onPress={() => router.replace('/(auth)/login')}
+          onPress={() => {
+            if (role === 'teacher') {
+              router.push('/(auth)/teacher/kyc');
+            } else {
+              router.replace('/(auth)/login');
+            }
+          }}
           disabled={!agreed}
         >
           <Text style={styles.registerBtnText}>Daftar Sekarang ➔</Text>
@@ -143,7 +240,37 @@ export default function RegisterScreen() {
           </TouchableOpacity>
         </View>
 
+       
+
       </ScrollView>
+
+      {/* Terms & Privacy Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{modalContent.title}</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <X size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalBody}>
+              <Text style={styles.modalText}>{modalContent.body}</Text>
+            </ScrollView>
+            <TouchableOpacity 
+              style={styles.modalCloseBtn} 
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.modalCloseText}>Saya Mengerti</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -197,10 +324,10 @@ const styles = StyleSheet.create({
   phoneDivider: { width: 1, height: 20, backgroundColor: '#E2E8F0', marginHorizontal: 12 },
   helperText: { fontSize: 11, color: '#7A8C9E', marginTop: 8 },
 
-  roleGrid: { flexDirection: 'row', gap: 16 },
-  roleCard: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 20, backgroundColor: '#FFF', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 20 },
+  roleGrid: { flexDirection: 'row', gap: 8 },
+  roleCard: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 16, backgroundColor: '#FFF', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 20 },
   roleCardActive: { borderColor: Colors.secondary, backgroundColor: '#E8F6ED' },
-  roleText: { marginTop: 8, fontSize: 14, fontWeight: 'bold', color: '#7A8C9E' },
+  roleText: { marginTop: 8, fontSize: 13, fontWeight: 'bold', color: '#7A8C9E', textAlign: 'center' },
   roleTextActiveGreen: { color: Colors.secondary },
 
   agreementBox: { flexDirection: 'row', backgroundColor: '#F0F2F5', padding: 16, borderRadius: 12, marginBottom: 24, alignItems: 'center' },
@@ -211,5 +338,22 @@ const styles = StyleSheet.create({
   registerBtnText: { color: '#FFF', fontSize: 14, fontWeight: 'bold' },
   
   footerContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 32 },
-  footerText: { fontSize: 14, color: '#7A8C9E' }
+  footerText: { fontSize: 14, color: '#7A8C9E' },
+
+  teacherExtraFields: { backgroundColor: '#F8FAFC', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: '#E2E8F0' },
+  uploadBox: { height: 100, backgroundColor: '#FFF', borderRadius: 12, borderWidth: 1, borderColor: '#D0D0D0', borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center' },
+  uploadText: { fontSize: 13, color: Colors.textMuted, marginTop: 8 },
+  rowForm: { flexDirection: 'row' },
+
+  agreementOuter: { flexDirection: 'row', backgroundColor: '#F0F2F5', padding: 16, borderRadius: 12, marginBottom: 24, alignItems: 'center' },
+  checkboxTouch: { paddingRight: 4 },
+  
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#FFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '80%', padding: 24 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', color: Colors.primary },
+  modalBody: { flex: 1 },
+  modalText: { fontSize: 13, color: Colors.text, lineHeight: 22 },
+  modalCloseBtn: { backgroundColor: Colors.primary, paddingVertical: 14, borderRadius: 24, alignItems: 'center', marginTop: 20 },
+  modalCloseText: { color: '#FFF', fontWeight: 'bold', fontSize: 14 }
 });

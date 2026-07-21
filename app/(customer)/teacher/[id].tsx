@@ -3,13 +3,14 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Colors from '@/src/constants/Colors';
-import { ArrowLeft, Star, MapPin, Award, BookOpen, GraduationCap } from 'lucide-react-native';
+import { ArrowLeft, Star, MapPin, Award, BookOpen, GraduationCap, Heart } from 'lucide-react-native';
 import Button from '@/src/components/ui/Button';
 import { useReviewStore } from '@/src/store/useReviewStore';
 
 export default function TeacherProfile() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const [isFavorite, setIsFavorite] = React.useState(false);
   const reviews = useReviewStore((state) => state.reviews);
   const teacherReviews = reviews.filter(r => r.teacherId === (id || "1"));
 
@@ -20,6 +21,9 @@ export default function TeacherProfile() {
         <View style={styles.coverPhoto}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtnCircle}>
             <ArrowLeft size={24} color="#FFF" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)} style={styles.favBtnCircle}>
+            <Heart size={20} color={isFavorite ? "#FF4D4D" : "#FFF"} fill={isFavorite ? "#FF4D4D" : "transparent"} />
           </TouchableOpacity>
         </View>
         
@@ -119,8 +123,9 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FAFAFA' },
   scrollContent: { paddingBottom: 100 },
   
-  coverPhoto: { height: 180, backgroundColor: Colors.primary, paddingTop: 40, paddingHorizontal: 16 },
+  coverPhoto: { height: 180, backgroundColor: Colors.primary, paddingTop: 40, paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   backBtnCircle: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' },
+  favBtnCircle: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' },
   
   profileBox: { backgroundColor: '#FFF', marginHorizontal: 20, marginTop: -60, borderRadius: 20, padding: 24, paddingBottom: 32, alignItems: 'center', shadowColor: '#000', shadowOffset: { width:0, height:4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 6 },
   avatar: { width: 100, height: 100, borderRadius: 50, borderWidth: 4, borderColor: '#FFF', marginTop: -50, marginBottom: 16, backgroundColor: '#E0E0E0' },

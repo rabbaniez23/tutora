@@ -41,6 +41,21 @@ export default function StudySession() {
     );
   };
 
+  const handleSOS = () => {
+    Alert.alert(
+      "Memicu Sinyal Darurat",
+      "Lokasi aktual dan rekaman suara dari mikrofon akan mulai direkam dan dikirim ke Orang Tua. Lanjutkan?",
+      [
+        { text: "Batal", style: "cancel" },
+        { 
+          text: "Kirim Sekarang!", 
+          onPress: () => Alert.alert("SOS Terkirim", "Data berhasil dikirim. Harap tetap tenang, bantuan sedang dihubungi."),
+          style: "destructive"
+        }
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -72,6 +87,9 @@ export default function StudySession() {
       </View>
 
       <View style={styles.footer}>
+        <TouchableOpacity style={styles.sosButton} onPress={handleSOS}>
+          <Text style={styles.sosButtonText}>SOS / Darurat</Text>
+        </TouchableOpacity>
         <Button 
           title="Akhiri Kelas & Beri Ulasan" 
           onPress={endSession} 
@@ -133,5 +151,8 @@ const styles = StyleSheet.create({
   },
   safetyText: { fontSize: 13, color: '#E65100', flex: 1, marginLeft: 12, lineHeight: 20 },
 
-  footer: { padding: 24, backgroundColor: '#FFF', borderTopWidth: 1, borderTopColor: Colors.border }
+  footer: { padding: 24, backgroundColor: '#FFF', borderTopWidth: 1, borderTopColor: Colors.border },
+
+  sosButton: { backgroundColor: '#FF3B30', padding: 16, borderRadius: 30, alignItems: 'center', marginBottom: 16, shadowColor: '#FF3B30', shadowOffset: { width:0, height:4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  sosButtonText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
 });

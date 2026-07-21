@@ -9,6 +9,7 @@ import Button from '@/src/components/ui/Button';
 export default function ActiveJob() {
   const router = useRouter();
   const [jobStatus, setJobStatus] = useState<'on_the_way' | 'arrived' | 'teaching'>('on_the_way');
+  const [distanceToStudent, setDistanceToStudent] = useState(150); // meters
 
   const handleNextAction = () => {
     if (jobStatus === 'on_the_way') {
@@ -16,19 +17,22 @@ export default function ActiveJob() {
     } else if (jobStatus === 'arrived') {
       setJobStatus('teaching');
     } else if (jobStatus === 'teaching') {
-      // Finish Session
-      Alert.alert('Sesi Selesai', 'Pendapatan telah dimasukkan ke dompet Anda.', [
-        { text: 'Oke', onPress: () => router.replace('/(teacher)/(tabs)') }
-      ]);
+      // Pindah ke Laporan
+      router.replace('/(teacher)/job/report');
     }
   };
 
   const getButtonTitle = () => {
     switch (jobStatus) {
-      case 'on_the_way': return 'Saya Sudah Sampai';
-      case 'arrived': return 'Mulai Sesi Mengajar';
+      case 'on_the_way': return 'Saya Sudah Sampai Lokasi';
+      case 'arrived': return distanceToStudent > 100 ? `Area Berbeda (${distanceToStudent}m)` : 'Mulai Sesi Mengajar';
       case 'teaching': return 'Selesaikan Sesi';
     }
+  };
+
+  const isButtonDisabled = () => {
+    if (jobStatus === 'arrived' && distanceToStudent > 100) return true;
+    return false;
   };
 
   const getButtonVariant = () => {
@@ -80,11 +84,18 @@ export default function ActiveJob() {
           </>
         )}
 
+        {jobStatus === 'arrived' && distanceToStudent > 100 && (
+          <TouchableOpacity onPress={() => setDistanceToStudent(45)} style={{ marginBottom: 16, alignItems: 'center', backgroundColor: Colors.surface, padding: 8, borderRadius: 8 }}>
+            <Text style={{ color: Colors.primary, fontSize: 11, fontWeight: 'bold' }}>[Mock] Teleport ke radius &lt;100m</Text>
+          </TouchableOpacity>
+        )}
+
         <Button 
           title={getButtonTitle()} 
           variant={getButtonVariant() as 'primary' | 'secondary'}
           onPress={handleNextAction} 
-          style={styles.mainActionBtn}
+          disabled={isButtonDisabled()}
+          style={[styles.mainActionBtn, isButtonDisabled() && { backgroundColor: Colors.border, borderColor: Colors.border } ]}
         />
       </View>
     </SafeAreaView>

@@ -10,14 +10,16 @@ export default function LoginScreen() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.login);
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<'customer' | 'teacher'>('customer');
+  const [role, setRole] = useState<'customer' | 'teacher' | 'parent'>('customer');
 
   const handleLogin = () => {
-    setAuth(role);
+    setAuth(role as any);
     if (role === 'customer') {
       router.replace('/(customer)/(tabs)');
-    } else {
+    } else if (role === 'teacher') {
       router.replace('/(teacher)/(tabs)');
+    } else if (role === 'parent') {
+      router.replace('/(parent)/(tabs)');
     }
   };
 
@@ -100,6 +102,14 @@ export default function LoginScreen() {
               <BookOpen size={24} color={role === 'teacher' ? Colors.primary : Colors.textMuted} />
               <Text style={[styles.roleText, role === 'teacher' && styles.roleTextActive]}>Tutor</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.roleCard, role === 'parent' && styles.roleCardActive]}
+              onPress={() => setRole('parent')}
+            >
+              <User size={24} color={role === 'parent' ? Colors.primary : Colors.textMuted} />
+              <Text style={[styles.roleText, role === 'parent' && styles.roleTextActive]}>Wali / Tua</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -172,10 +182,10 @@ const styles = StyleSheet.create({
   inputText: { flex: 1, fontSize: 14, color: '#0A1E3F', height: '100%' },
 
   roleSection: { marginBottom: 24 },
-  roleGrid: { flexDirection: 'row', gap: 12 },
-  roleCard: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 16, backgroundColor: '#FFF', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 20 },
+  roleGrid: { flexDirection: 'row', gap: 8 },
+  roleCard: { flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingVertical: 16, backgroundColor: '#FFF', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 20 },
   roleCardActive: { borderColor: Colors.primary, backgroundColor: Colors.lightBlue },
-  roleText: { marginLeft: 8, fontSize: 14, fontWeight: 'bold', color: Colors.textMuted },
+  roleText: { marginTop: 8, fontSize: 12, fontWeight: 'bold', color: Colors.textMuted, textAlign: 'center' },
   roleTextActive: { color: Colors.primary },
 
   loginBtn: { backgroundColor: Colors.primary, borderRadius: 30, paddingVertical: 18, marginTop: 8, alignItems: 'center' },
