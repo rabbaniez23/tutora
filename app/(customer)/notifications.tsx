@@ -4,40 +4,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, CheckCircle2, Clock, Info, XCircle } from 'lucide-react-native';
+import EmptyState from '@/src/components/ui/EmptyState';
 
 const NOTIFICATIONS = [
-  {
-    id: '1',
-    type: 'success',
-    title: 'Pembayaran Berhasil',
-    message: 'Pembayaran untuk kelas Kalkulus Lanjut sebesar Rp 150.000 telah terkonfirmasi.',
-    time: '10 menit yang lalu',
-    read: false,
-  },
-  {
-    id: '2',
-    type: 'reminder',
-    title: 'Pengingat Kelas',
-    message: 'Kelas Bahasa Inggris - TOEFL Prep dengan Sari Wijaya akan dimulai dalam 30 menit. Siapkan dirimu!',
-    time: '1 jam yang lalu',
-    read: false,
-  },
-  {
-    id: '3',
-    type: 'info',
-    title: 'Pemesanan Selesai',
-    message: 'Sesi Matematika Dasar kamu telah selesai. Jangan lupa beri ulasan bintang 5 untuk tutor ya!',
-    time: 'Kemarin',
-    read: true,
-  },
-  {
-    id: '4',
-    type: 'error',
-    title: 'Pesanan Dibatalkan',
-    message: 'Sesi Fisika Dasar dengan Andi Pratama dibatalkan. Dana sejumlah Rp 120.000 sedang diproses untuk dikembalikan.',
-    time: '2 hari yang lalu',
-    read: true,
-  },
+  // Kosongkan array ini jika ingin melihat Empty State
+  // {
+  //   id: '1',
+  //   type: 'success',
+  //   title: 'Pembayaran Berhasil',
+  //   message: 'Pembayaran untuk kelas Kalkulus Lanjut sebesar Rp 150.000 telah terkonfirmasi.',
+  //   time: '10 menit yang lalu',
+  //   read: false,
+  // },
 ];
 
 export default function NotificationsScreen() {
@@ -75,10 +53,11 @@ export default function NotificationsScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         
         {NOTIFICATIONS.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>Belum ada notifikasi</Text>
-            <Text style={styles.emptySubtitle}>Jadwal kelas atau transaksi terbarumu akan muncul di sini.</Text>
-          </View>
+          <EmptyState 
+            title="Belum ada notifikasi" 
+            description="Jadwal kelas atau transaksi terbarumu akan muncul di sini." 
+            icon="bell" 
+          />
         ) : (
           NOTIFICATIONS.map((item) => (
             <TouchableOpacity 

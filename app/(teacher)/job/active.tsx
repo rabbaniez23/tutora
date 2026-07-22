@@ -1,15 +1,18 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { Map, MapPin, Phone, MessageCircle } from 'lucide-react-native';
 import Button from '@/src/components/ui/Button';
+import CustomModal from '@/src/components/ui/CustomModal';
 
 export default function ActiveJob() {
   const router = useRouter();
   const [jobStatus, setJobStatus] = useState<'on_the_way' | 'arrived' | 'teaching'>('on_the_way');
   const [distanceToStudent, setDistanceToStudent] = useState(150); // meters
+  const [cancelModalVisible, setCancelModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleNextAction = () => {
     if (jobStatus === 'on_the_way') {
@@ -20,6 +23,15 @@ export default function ActiveJob() {
       // Pindah ke Laporan
       router.replace('/(teacher)/job/report');
     }
+  };
+
+  const handleCancelJob = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setCancelModalVisible(false);
+      router.replace('/(teacher)/(tabs)');
+    }, 1500);
   };
 
   const getButtonTitle = () => {
@@ -73,10 +85,13 @@ export default function ActiveJob() {
               </View>
               
               <View style={styles.actionRowMini}>
-                <TouchableOpacity style={styles.iconBtnMini}>
+                <TouchableOpacity style={styles.iconBtnMini} onPress={() => router.push('/(customer)/chat/room')}>
                   <MessageCircle size={20} color={Colors.primary} />
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.iconBtnMini, { backgroundColor: Colors.secondary + '20' }]}>
+                <TouchableOpacity 
+                  style={[styles.iconBtnMini, { backgroundColor: Colors.secondary + '20' }]}
+                  onPress={() => Linking.openURL('tel:081234567890')}
+                >
                   <Phone size={20} color={Colors.secondary} />
                 </TouchableOpacity>
               </View>
@@ -97,7 +112,25 @@ export default function ActiveJob() {
           disabled={isButtonDisabled()}
           style={[styles.mainActionBtn, isButtonDisabled() && { backgroundColor: Colors.border, borderColor: Colors.border } ]}
         />
+
+        {jobStatus !== 'teaching' && (
+          <TouchableOpacity onPress={() => setCancelModalVisible(true)} style={{ marginTop: 16, alignItems: 'center' }}>
+            <Text style={{ color: '#FF4D4D', fontWeight: 'bold' }}>Batalkan Pesanan</Text>
+          </TouchableOpacity>
+        )}
       </View>
+
+      <CustomModal 
+        visible={cancelModalVisible}
+        title="Batalkan Pesanan?"
+        message="Anda yakin ingin membatalkan pesanan ini? Ini akan memengaruhi rating Anda sebagai tutor."
+        confirmText="Batalkan"
+        cancelText="Kembali"
+        onConfirm={handleCancelJob}
+        onCancel={() => setCancelModalVisible(false)}
+        variant="danger"
+        loading={loading}
+      />
     </SafeAreaView>
   );
 }

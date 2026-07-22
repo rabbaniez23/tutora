@@ -4,53 +4,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, MoreVertical, Search } from 'lucide-react-native';
+import EmptyState from '@/src/components/ui/EmptyState';
 
 const CHATS = [
-  {
-    id: '1',
-    name: 'Dr. Sarah Wilson',
-    message: 'Halo, apakah jadwal bimbingan...',
-    time: '14.30',
-    unread: 2,
-    online: true,
-    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80',
-  },
-  {
-    id: '2',
-    name: 'Prof. James Miller',
-    message: 'Materi untuk pertemuan minggu depan...',
-    time: '10.15',
-    unread: 0,
-    online: false,
-    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=150&q=80',
-  },
-  {
-    id: '3',
-    name: 'Maria Elena, M.Pd.',
-    message: 'Terima kasih atas diskusinya tadi, Kak!',
-    time: 'Kemarin',
-    unread: 0,
-    online: false,
-    avatar: 'https://images.unsplash.com/photo-1580894732444-8ecded790047?auto=format&fit=crop&w=150&q=80',
-  },
-  {
-    id: '4',
-    name: 'Budi Santoso',
-    message: 'Bagaimana dengan progres...',
-    time: 'Senin',
-    unread: 1,
-    online: true,
-    avatar: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=150&q=80',
-  },
-  {
-    id: '5',
-    name: 'Dr. Amanda Putri',
-    message: 'Sama-sama, selamat belajar ya.',
-    time: '22 Okt',
-    unread: 0,
-    online: false,
-    avatar: 'https://images.unsplash.com/photo-1598550874175-4d0ef43ee90d?auto=format&fit=crop&w=150&q=80',
-  },
+  // Kosongkan array ini jika ingin melihat Empty State
+  // {
+  //   id: '1',
+  //   name: 'Dr. Sarah Wilson',
+  //   message: 'Halo, apakah jadwal bimbingan...',
+  //   time: '14.30',
+  //   unread: 2,
+  //   online: true,
+  //   avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80',
+  // }
 ];
 
 export default function ChatScreen() {
@@ -112,13 +78,21 @@ export default function ChatScreen() {
       </View>
 
       {/* Chat List */}
-      <FlatList 
-        data={CHATS}
-        keyExtractor={(item) => item.id}
-        renderItem={renderChatItem}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {CHATS.length === 0 ? (
+        <EmptyState 
+          title="Pesan Kosong" 
+          description="Anda belum memiliki obrolan dengan tutor mana pun. Mulai cari tutor sekarang." 
+          icon="inbox" 
+        />
+      ) : (
+        <FlatList 
+          data={CHATS}
+          keyExtractor={(item) => item.id}
+          renderItem={renderChatItem}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </SafeAreaView>
   );
 }

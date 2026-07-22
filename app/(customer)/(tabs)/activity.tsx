@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, Wallet, RotateCcw, MessageSquare, Star } from 'lucide-react-native';
+import EmptyState from '@/src/components/ui/EmptyState';
 
 const TABS = ['Dalam Proses', 'Terjadwal', 'Riwayat'];
 const FILTERS = ['Semua Pelajaran', 'Bulan Ini', 'Matematika', 'Fisika'];
@@ -59,8 +60,17 @@ export default function ActivityScreen() {
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         
-        {/* Section: OKTOBER 2023 */}
-        <Text style={styles.monthLabel}>OKTOBER 2023</Text>
+        {/* Mock: No data state */}
+        {activeTab !== 'Riwayat' ? (
+          <EmptyState 
+            title="Belum ada aktivitas" 
+            description="Anda belum memesan tutor di kategori ini. Mulai cari tutor terbaik untuk Anda sekarang." 
+            icon="ghost" 
+          />
+        ) : (
+          <>
+            {/* Section: OKTOBER 2023 */}
+            <Text style={styles.monthLabel}>OKTOBER 2023</Text>
 
         {/* Card 1 */}
         <View style={styles.card}>
@@ -145,7 +155,8 @@ export default function ActivityScreen() {
             </TouchableOpacity>
           </View>
         </View>
-
+        </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

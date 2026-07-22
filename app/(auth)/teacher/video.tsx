@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
@@ -25,6 +25,15 @@ export default function TeacherVideo() {
   };
 
   const submitApplication = () => {
+    if (Platform.OS === 'web') {
+      const isConfirmed = window.confirm("Apakah Anda yakin data dan video sudah sesuai?");
+      if (isConfirmed) {
+        setTutorStatus('review_video');
+        router.push('/(teacher)/waiting');
+      }
+      return;
+    }
+
     Alert.alert(
       "Kirim Pendaftaran",
       "Apakah Anda yakin data dan video sudah sesuai?",

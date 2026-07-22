@@ -5,14 +5,22 @@ import Colors from "@/src/constants/Colors";
 import { ChevronRight, ArrowLeft, Pencil, Award, ShieldCheck, MapPin, CreditCard, HelpCircle, LogOut } from "lucide-react-native";
 import { useRouter } from 'expo-router';
 import { useAuthStore } from "@/src/store/useAuthStore";
+import CustomModal from "@/src/components/ui/CustomModal";
 
 export default function CustomerProfile() {
   const router = useRouter();
   const logout = useAuthStore((state) => state.logout);
+  const [logoutModalVisible, setLogoutModalVisible] = React.useState(false);
+  const [loggingOut, setLoggingOut] = React.useState(false);
 
-  const handleLogout = () => {
-    logout();
-    router.replace('/(auth)/login');
+  const handleConfirmLogout = () => {
+    setLoggingOut(true);
+    setTimeout(() => {
+      setLoggingOut(false);
+      setLogoutModalVisible(false);
+      logout();
+      router.replace('/(auth)/login');
+    }, 1000);
   };
 
   return (
@@ -93,12 +101,24 @@ export default function CustomerProfile() {
         </View>
 
         {/* Logout Button */}
-        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+        <TouchableOpacity style={styles.logoutBtn} onPress={() => setLogoutModalVisible(true)}>
           <LogOut size={20} color="#FF4D4D" style={{ marginRight: 8 }} />
           <Text style={styles.logoutText}>Keluar</Text>
         </TouchableOpacity>
 
       </ScrollView>
+
+      <CustomModal 
+        visible={logoutModalVisible}
+        title="Konfirmasi Keluar"
+        message="Apakah Anda yakin ingin keluar dari akun ini? Anda harus masuk kembali untuk melanjutkan."
+        confirmText="Keluar"
+        cancelText="Batal"
+        onConfirm={handleConfirmLogout}
+        onCancel={() => setLogoutModalVisible(false)}
+        variant="danger"
+        loading={loggingOut}
+      />
     </SafeAreaView>
   );
 }

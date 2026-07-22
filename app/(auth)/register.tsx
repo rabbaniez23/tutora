@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Modal, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
@@ -14,6 +14,40 @@ export default function RegisterScreen() {
   
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState({ title: '', body: '' });
+
+  // Form State
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<any>({});
+
+  const handleRegister = () => {
+    // Validation
+    const newErrors: any = {};
+    if (!name) newErrors.name = 'Nama lengkap wajib diisi.';
+    if (!email) newErrors.email = 'Email wajib diisi.';
+    if (!phone) newErrors.phone = 'Nomor telepon wajib diisi.';
+    if (!password) newErrors.password = 'Kata sandi wajib diisi.';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+    setLoading(true);
+
+    setTimeout(() => {
+      setLoading(false);
+      if (role === 'teacher') {
+        router.push('/(auth)/teacher/kyc');
+      } else {
+        router.replace('/(auth)/login');
+      }
+    }, 1500);
+  };
 
   const openTerms = () => {
     setModalContent({ title: 'Ketentuan Layanan', body: TERMS_AND_CONDITIONS });
@@ -57,39 +91,51 @@ export default function RegisterScreen() {
         {/* Form */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Nama Lengkap</Text>
-          <View style={styles.inputRow}>
-            <User size={20} color={Colors.textMuted} style={styles.iconSpaced} />
+          <View style={[styles.inputRow, errors.name && styles.inputError]}>
+            <User size={20} color={errors.name ? Colors.primary : Colors.textMuted} style={styles.iconSpaced} />
             <TextInput 
               placeholder="Contoh: Delia Puspitasari" 
               placeholderTextColor={Colors.textMuted}
               style={styles.inputText}
+              value={name}
+              onChangeText={(t) => { setName(t); setErrors({...errors, name: null}); }}
             />
           </View>
+          {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
         </View>
 
         <View style={styles.formGroup}>
           <Text style={styles.label}>Alamat Email</Text>
-          <View style={styles.inputRow}>
-            <Mail size={20} color={Colors.textMuted} style={styles.iconSpaced} />
+          <View style={[styles.inputRow, errors.email && styles.inputError]}>
+            <Mail size={20} color={errors.email ? Colors.primary : Colors.textMuted} style={styles.iconSpaced} />
             <TextInput 
               placeholder="Delia.puspitasari@email.com" 
               placeholderTextColor={Colors.textMuted}
               style={styles.inputText}
+              value={email}
+              onChangeText={(t) => { setEmail(t); setErrors({...errors, email: null}); }}
+              autoCapitalize="none"
+              keyboardType="email-address"
             />
           </View>
+          {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
         </View>
 
         <View style={styles.formGroup}>
           <Text style={styles.label}>Nomor Telepon</Text>
-          <View style={styles.inputRowPhone}>
+          <View style={[styles.inputRowPhone, errors.phone && styles.inputError]}>
             <Text style={styles.phonePrefix}>+62</Text>
             <View style={styles.phoneDivider} />
             <TextInput 
               placeholder="812 3456 7890" 
               placeholderTextColor={Colors.textMuted}
               style={styles.inputText} 
+              value={phone}
+              onChangeText={(t) => { setPhone(t); setErrors({...errors, phone: null}); }}
+              keyboardType="phone-pad"
             />
           </View>
+          {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
         </View>
 
         {/* Role Selection */}
@@ -192,19 +238,25 @@ export default function RegisterScreen() {
         {/* Password */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Kata Sandi</Text>
-          <View style={styles.inputRow}>
-            <Lock size={20} color={Colors.textMuted} style={styles.iconSpaced} />
+          <View style={[styles.inputRow, errors.password && styles.inputError]}>
+            <Lock size={20} color={errors.password ? Colors.primary : Colors.textMuted} style={styles.iconSpaced} />
             <TextInput 
               placeholder="••••••••" 
               placeholderTextColor={Colors.textMuted}
               secureTextEntry={!showPassword}
               style={styles.inputText}
+              value={password}
+              onChangeText={(t) => { setPassword(t); setErrors({...errors, password: null}); }}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.iconHover}>
               {showPassword ? <EyeOff size={20} color={Colors.textMuted} /> : <Eye size={20} color={Colors.textMuted} />}
             </TouchableOpacity>
           </View>
-          <Text style={styles.helperText}>Minimal 8 karakter dengan kombinasi huruf dan angka.</Text>
+          {errors.password ? (
+            <Text style={styles.errorText}>{errors.password}</Text>
+          ) : (
+            <Text style={styles.helperText}>Minimal 8 karakter dengan kombinasi huruf dan angka.</Text>
+          )}
         </View>
 
         {/* Agreement */}
@@ -220,16 +272,14 @@ export default function RegisterScreen() {
         {/* Action */}
         <TouchableOpacity 
           style={[styles.registerBtn, !agreed && { opacity: 0.5 }]} 
-          onPress={() => {
-            if (role === 'teacher') {
-              router.push('/(auth)/teacher/kyc');
-            } else {
-              router.replace('/(auth)/login');
-            }
-          }}
-          disabled={!agreed}
+          onPress={handleRegister}
+          disabled={!agreed || loading}
         >
-          <Text style={styles.registerBtnText}>Daftar Sekarang ➔</Text>
+          {loading ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.registerBtnText}>Daftar Sekarang ➔</Text>
+          )}
         </TouchableOpacity>
 
         {/* Footer */}
@@ -323,6 +373,8 @@ const styles = StyleSheet.create({
   phonePrefix: { paddingLeft: 16, fontSize: 14, fontWeight: 'bold', color: '#0A1E3F' },
   phoneDivider: { width: 1, height: 20, backgroundColor: '#E2E8F0', marginHorizontal: 12 },
   helperText: { fontSize: 11, color: '#7A8C9E', marginTop: 8 },
+  errorText: { fontSize: 11, color: '#FF3B30', marginTop: 8 },
+  inputError: { borderColor: '#FF3B30' },
 
   roleGrid: { flexDirection: 'row', gap: 8 },
   roleCard: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 16, backgroundColor: '#FFF', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 20 },

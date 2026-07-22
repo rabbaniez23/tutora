@@ -36,6 +36,15 @@ export default function SubjectSelection() {
   
   const [promoModalVisible, setPromoModalVisible] = useState(false);
   const [selectedPromo, setSelectedPromo] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleOrder = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      router.push('/(customer)/order/searching');
+    }, 1500);
+  };
 
   // Price Calculation
   const basePrice = LEVELS.find(l => l.id === level)?.price || 80000;
@@ -216,7 +225,8 @@ export default function SubjectSelection() {
 
         <Button 
           title="Cari Tutor Sekarang" 
-          onPress={() => router.push('/(customer)/order/searching')} 
+          onPress={handleOrder}
+          loading={loading}
         />
       </View>
 

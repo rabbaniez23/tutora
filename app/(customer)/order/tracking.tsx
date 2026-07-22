@@ -1,6 +1,6 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Linking } from 'react-native';
 import { MapView, Marker, Polyline } from '@/src/components/MapComponent';
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
@@ -65,10 +65,10 @@ export default function Tracking() {
         </View>
 
         <View style={styles.actionRow}>
-          <TouchableOpacity style={styles.iconBtn}>
+          <TouchableOpacity style={styles.iconBtn} onPress={() => router.push('/(customer)/chat/room')}>
             <MessageCircle size={24} color={Colors.primary} />
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.iconBtn, { backgroundColor: Colors.secondary + '20' }]}>
+          <TouchableOpacity style={[styles.iconBtn, { backgroundColor: Colors.secondary + '20' }]} onPress={() => Linking.openURL('tel:081234567890')}>
             <Phone size={24} color={Colors.secondary} />
           </TouchableOpacity>
         </View>

@@ -5,22 +5,44 @@ import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, User, Lock, Eye, EyeOff, BookOpen, GraduationCap } from 'lucide-react-native';
 import { useAuthStore } from '@/src/store/useAuthStore';
+import Button from '@/src/components/ui/Button';
 
 export default function LoginScreen() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.login);
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<'customer' | 'teacher' | 'parent'>('customer');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const handleLogin = () => {
-    setAuth(role as any);
-    if (role === 'customer') {
-      router.replace('/(customer)/(tabs)');
-    } else if (role === 'teacher') {
-      router.replace('/(teacher)/(tabs)');
-    } else if (role === 'parent') {
-      router.replace('/(parent)/(tabs)');
+    // Validation
+    const newErrors: { email?: string; password?: string } = {};
+    if (!email) newErrors.email = 'Email atau nomor HP wajib diisi.';
+    if (!password) newErrors.password = 'Kata sandi wajib diisi.';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
     }
+
+    setErrors({});
+    setLoading(true);
+
+    // Simulate API Call
+    setTimeout(() => {
+      setLoading(false);
+      setAuth(role as any);
+      if (role === 'customer') {
+        router.replace('/(customer)/(tabs)');
+      } else if (role === 'teacher') {
+        router.replace('/(teacher)/(tabs)');
+      } else if (role === 'parent') {
+        router.replace('/(parent)/(tabs)');
+      }
+    }, 1500);
   };
 
   return (
@@ -54,14 +76,19 @@ export default function LoginScreen() {
         <View style={styles.formSection}>
           <Text style={styles.label}>Email atau Nomor HP</Text>
           {/* Properly aligned Row Input Container */}
-          <View style={styles.inputRow}>
-            <User size={20} color={Colors.textMuted} style={styles.iconSpaced} />
+          <View style={[styles.inputRow, errors.email && styles.inputRowError]}>
+            <User size={20} color={errors.email ? Colors.primary : Colors.textMuted} style={styles.iconSpaced} />
             <TextInput 
               placeholder="Contoh: 08123456789" 
               placeholderTextColor={Colors.textMuted}
               style={styles.inputText}
+              value={email}
+              onChangeText={(text) => { setEmail(text); setErrors({ ...errors, email: undefined }); }}
+              autoCapitalize="none"
+              keyboardType="email-address"
             />
           </View>
+          {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
           <View style={styles.labelRow}>
             <Text style={styles.label}>Kata Sandi</Text>
@@ -69,18 +96,21 @@ export default function LoginScreen() {
               <Text style={styles.forgotText}>Lupa Password?</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.inputRow}>
-            <Lock size={20} color={Colors.textMuted} style={styles.iconSpaced} />
+          <View style={[styles.inputRow, errors.password && styles.inputRowError]}>
+            <Lock size={20} color={errors.password ? Colors.primary : Colors.textMuted} style={styles.iconSpaced} />
             <TextInput 
               placeholder="Masukkan kata sandi Anda" 
               placeholderTextColor={Colors.textMuted}
               secureTextEntry={!showPassword}
               style={styles.inputText}
+              value={password}
+              onChangeText={(text) => { setPassword(text); setErrors({ ...errors, password: undefined }); }}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.iconHover}>
               {showPassword ? <EyeOff size={20} color={Colors.textMuted} /> : <Eye size={20} color={Colors.textMuted} />}
             </TouchableOpacity>
           </View>
+          {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
         </View>
 
         {/* Role Selector */}
@@ -114,9 +144,12 @@ export default function LoginScreen() {
         </View>
 
         {/* Actions */}
-        <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
-          <Text style={styles.loginBtnText}>Masuk ➔</Text>
-        </TouchableOpacity>
+        <Button 
+          title="Masuk ➔"
+          onPress={handleLogin}
+          loading={loading}
+          style={{ marginTop: 8 }}
+        />
 
         {/* Divider */}
         <View style={styles.dividerRow}>
@@ -176,6 +209,15 @@ const styles = StyleSheet.create({
     borderRadius: 24, 
     paddingHorizontal: 16, 
     height: 52 
+  },
+  inputRowError: {
+    borderColor: '#FF3B30',
+  },
+  errorText: {
+    color: '#FF3B30',
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 12,
   },
   iconSpaced: { marginRight: 12 },
   iconHover: { padding: 4 },

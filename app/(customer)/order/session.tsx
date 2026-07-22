@@ -5,12 +5,16 @@ import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { Clock, CheckCircle2, ShieldAlert } from 'lucide-react-native';
 import Button from '@/src/components/ui/Button';
+import CustomModal from '@/src/components/ui/CustomModal';
 
 export default function StudySession() {
   const router = useRouter();
   
   // Timer mock untuk 60 menit (3600 detik)
   const [timeLeft, setTimeLeft] = useState(3600);
+  const [endModalVisible, setEndModalVisible] = useState(false);
+  const [sosModalVisible, setSosModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const timerId = setInterval(() => {
@@ -27,33 +31,29 @@ export default function StudySession() {
   };
 
   const endSession = () => {
-    Alert.alert(
-      "Akhiri Sesi",
-      "Apakah kamu yakin ingin mengakhiri sesi belajar ini lebih awal?",
-      [
-        { text: "Lanjutkan Belajar", style: "cancel" },
-        { 
-          text: "Ya, Selesaikan", 
-          onPress: () => router.push('/(customer)/order/review?teacherId=1'),
-          style: "destructive"
-        }
-      ]
-    );
+    setEndModalVisible(true);
+  };
+
+  const handleConfirmEndSession = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setEndModalVisible(false);
+      router.push('/(customer)/order/review?teacherId=1');
+    }, 1000);
   };
 
   const handleSOS = () => {
-    Alert.alert(
-      "Memicu Sinyal Darurat",
-      "Lokasi aktual dan rekaman suara dari mikrofon akan mulai direkam dan dikirim ke Orang Tua. Lanjutkan?",
-      [
-        { text: "Batal", style: "cancel" },
-        { 
-          text: "Kirim Sekarang!", 
-          onPress: () => Alert.alert("SOS Terkirim", "Data berhasil dikirim. Harap tetap tenang, bantuan sedang dihubungi."),
-          style: "destructive"
-        }
-      ]
-    );
+    setSosModalVisible(true);
+  };
+
+  const handleConfirmSOS = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setSosModalVisible(false);
+      // Idealnya bisa memunculkan toast/notifikasi berhasil di sini
+    }, 1500);
   };
 
   return (
@@ -95,6 +95,31 @@ export default function StudySession() {
           onPress={endSession} 
         />
       </View>
+
+      {/* Modals */}
+      <CustomModal 
+        visible={endModalVisible}
+        title="Akhiri Sesi"
+        message="Apakah kamu yakin ingin mengakhiri sesi belajar ini lebih awal?"
+        confirmText="Ya, Selesaikan"
+        cancelText="Lanjutkan Belajar"
+        onConfirm={handleConfirmEndSession}
+        onCancel={() => setEndModalVisible(false)}
+        variant="danger"
+        loading={loading}
+      />
+
+      <CustomModal 
+        visible={sosModalVisible}
+        title="Memicu Sinyal Darurat"
+        message="Lokasi aktual dan rekaman suara dari mikrofon akan mulai direkam dan dikirim ke Orang Tua. Lanjutkan?"
+        confirmText="Kirim Sekarang!"
+        cancelText="Batal"
+        onConfirm={handleConfirmSOS}
+        onCancel={() => setSosModalVisible(false)}
+        variant="danger"
+        loading={loading}
+      />
     </SafeAreaView>
   );
 }

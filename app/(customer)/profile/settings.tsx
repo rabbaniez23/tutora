@@ -4,11 +4,33 @@ import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView } from 're
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, Bell, Globe, Moon, Shield, ChevronRight } from 'lucide-react-native';
+import CustomModal from '@/src/components/ui/CustomModal';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleDeleteAccount = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setDeleteModalVisible(false);
+      router.replace('/(auth)/login');
+    }, 1500);
+  };
+
+  const handleChangePassword = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setPasswordModalVisible(false);
+    }, 1000);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -70,7 +92,7 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>PRIVASI & KEAMANAN</Text>
         
         <View style={styles.settingGroup}>
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity style={styles.settingItem} onPress={() => setPasswordModalVisible(true)}>
             <View style={styles.settingLeft}>
               <View style={[styles.iconBox, { backgroundColor: Colors.lightRed }]}>
                 <Shield size={20} color="#FF4D4D" />
@@ -79,12 +101,36 @@ export default function SettingsScreen() {
             </View>
             <ChevronRight size={20} color={Colors.textMuted} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity style={styles.settingItem} onPress={() => setDeleteModalVisible(true)}>
             <Text style={[styles.settingLabel, { color: '#FF4D4D', marginLeft: 16 }]}>Hapus Akun Permanen</Text>
             <ChevronRight size={20} color={Colors.textMuted} />
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <CustomModal 
+        visible={deleteModalVisible}
+        title="Hapus Akun Permanen?"
+        message="Tindakan ini tidak dapat dibatalkan. Semua data riwayat pesanan, profil, dan saldo Anda akan dihapus selamanya."
+        confirmText="Hapus Akun"
+        cancelText="Batal"
+        onConfirm={handleDeleteAccount}
+        onCancel={() => setDeleteModalVisible(false)}
+        variant="danger"
+        loading={loading}
+      />
+
+      <CustomModal 
+        visible={passwordModalVisible}
+        title="Ganti Kata Sandi"
+        message="Tautan untuk mengatur ulang kata sandi akan dikirimkan ke email terdaftar Anda. Lanjutkan?"
+        confirmText="Kirim Email"
+        cancelText="Batal"
+        onConfirm={handleChangePassword}
+        onCancel={() => setPasswordModalVisible(false)}
+        variant="primary"
+        loading={loading}
+      />
     </SafeAreaView>
   );
 }
