@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'rea
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, Camera, User, Mail, Phone } from 'lucide-react-native';
+import Toast from 'react-native-toast-message';
 import Input from '@/src/components/ui/Input';
 import Button from '@/src/components/ui/Button';
 
@@ -14,8 +15,13 @@ export default function EditProfile() {
   const [phone, setPhone] = useState('081234567890');
 
   const handleSave = () => {
-    // Simulasi penyimpanan
-    router.back();
+    Toast.show({
+      type: 'success',
+      text1: 'Profil Tersimpan',
+      text2: 'Perubahan data profil Anda berhasil disimpan.',
+      position: 'bottom'
+    });
+    setTimeout(() => router.back(), 1500);
   };
 
   return (
@@ -34,7 +40,10 @@ export default function EditProfile() {
               source={require('@/assets/delia.webp')} 
               style={styles.avatarImage} 
             />
-            <TouchableOpacity style={styles.cameraBtn}>
+            <TouchableOpacity 
+              style={styles.cameraBtn}
+              onPress={() => Toast.show({ type: 'info', text1: 'Fitur Kamera Segera Hadir' })}
+            >
               <Camera size={16} color="#FFF" />
             </TouchableOpacity>
           </View>

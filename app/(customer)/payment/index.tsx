@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, Wallet, Plus, CreditCard, Landmark, CheckCircle2 } from 'lucide-react-native';
 import Button from '@/src/components/ui/Button';
+import Toast from 'react-native-toast-message';
 
 const SAVED_METHODS = [
   { id: '1', type: 'wallet', name: 'TutorPay', balance: 'Rp 125.000', icon: Wallet, color: Colors.primary },
@@ -14,6 +15,16 @@ const SAVED_METHODS = [
 
 export default function PaymentMethods() {
   const router = useRouter();
+  const [activeMethodId, setActiveMethodId] = React.useState('1');
+
+  const handleSelectMethod = (id: string, name: string) => {
+    setActiveMethodId(id);
+    Toast.show({
+      type: 'success',
+      text1: 'Metode Dipilih',
+      text2: `${name} telah diatur sebagai pembayaran utama.`
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -36,7 +47,10 @@ export default function PaymentMethods() {
             <Text style={styles.walletBalance}>Rp 125.000</Text>
           </View>
           <View style={styles.walletBottom}>
-            <TouchableOpacity style={styles.topUpBtn}>
+            <TouchableOpacity 
+              style={styles.topUpBtn}
+              onPress={() => Toast.show({ type: 'info', text1: 'Fitur Top Up Segera Hadir' })}
+            >
               <Plus size={16} color={Colors.primary} />
               <Text style={styles.topUpText}>Top Up Saldo</Text>
             </TouchableOpacity>
@@ -49,7 +63,11 @@ export default function PaymentMethods() {
           {SAVED_METHODS.map((method, index) => {
             const Icon = method.icon;
             return (
-              <TouchableOpacity key={method.id} style={styles.methodItem}>
+              <TouchableOpacity 
+                key={method.id} 
+                style={styles.methodItem}
+                onPress={() => handleSelectMethod(method.id, method.name)}
+              >
                 <View style={styles.methodLeft}>
                   <View style={[styles.methodIconBg, { backgroundColor: method.color + '15' }]}>
                     <Icon size={24} color={method.color} />
@@ -61,13 +79,16 @@ export default function PaymentMethods() {
                     </Text>
                   </View>
                 </View>
-                {index === 0 && <CheckCircle2 size={24} color={Colors.secondary} />}
+                {activeMethodId === method.id && <CheckCircle2 size={24} color={Colors.secondary} />}
               </TouchableOpacity>
             )
           })}
         </View>
 
-        <TouchableOpacity style={styles.addMethodBtn}>
+        <TouchableOpacity 
+          style={styles.addMethodBtn}
+          onPress={() => Toast.show({ type: 'info', text1: 'Fitur Tambah Metode Segera Hadir' })}
+        >
           <Plus size={20} color={Colors.primary} />
           <Text style={styles.addMethodText}>Tambah Metode Pembayaran</Text>
         </TouchableOpacity>
