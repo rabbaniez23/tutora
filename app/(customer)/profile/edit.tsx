@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'rea
 import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, Camera, User, Mail, Phone } from 'lucide-react-native';
-import Toast from 'react-native-toast-message';
+import { useToastStore } from '@/src/store/useToastStore';
 import Input from '@/src/components/ui/Input';
 import Button from '@/src/components/ui/Button';
 
@@ -13,14 +13,10 @@ export default function EditProfile() {
   const [name, setName] = useState('Delia Puspitasari');
   const [email, setEmail] = useState('delia.puspitasari@email.com');
   const [phone, setPhone] = useState('081234567890');
+  const showToast = useToastStore((state) => state.showToast);
 
   const handleSave = () => {
-    Toast.show({
-      type: 'success',
-      text1: 'Profil Tersimpan',
-      text2: 'Perubahan data profil Anda berhasil disimpan.',
-      position: 'bottom'
-    });
+    showToast('Perubahan data profil Anda berhasil disimpan.', 'success');
     setTimeout(() => router.back(), 1500);
   };
 
@@ -42,7 +38,7 @@ export default function EditProfile() {
             />
             <TouchableOpacity 
               style={styles.cameraBtn}
-              onPress={() => Toast.show({ type: 'info', text1: 'Fitur Kamera Segera Hadir' })}
+              onPress={() => showToast('Fitur Kamera Segera Hadir', 'info')}
             >
               <Camera size={16} color="#FFF" />
             </TouchableOpacity>

@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, Wallet, Plus, CreditCard, Landmark, CheckCircle2 } from 'lucide-react-native';
 import Button from '@/src/components/ui/Button';
-import Toast from 'react-native-toast-message';
+import { useToastStore } from '@/src/store/useToastStore';
 
 const SAVED_METHODS = [
   { id: '1', type: 'wallet', name: 'TutorPay', balance: 'Rp 125.000', icon: Wallet, color: Colors.primary },
@@ -16,14 +16,11 @@ const SAVED_METHODS = [
 export default function PaymentMethods() {
   const router = useRouter();
   const [activeMethodId, setActiveMethodId] = React.useState('1');
+  const showToast = useToastStore((state) => state.showToast);
 
   const handleSelectMethod = (id: string, name: string) => {
     setActiveMethodId(id);
-    Toast.show({
-      type: 'success',
-      text1: 'Metode Dipilih',
-      text2: `${name} telah diatur sebagai pembayaran utama.`
-    });
+    showToast(`${name} telah diatur sebagai pembayaran utama.`, 'success');
   };
 
   return (
@@ -49,7 +46,7 @@ export default function PaymentMethods() {
           <View style={styles.walletBottom}>
             <TouchableOpacity 
               style={styles.topUpBtn}
-              onPress={() => Toast.show({ type: 'info', text1: 'Fitur Top Up Segera Hadir' })}
+              onPress={() => showToast('Fitur Top Up Segera Hadir', 'info')}
             >
               <Plus size={16} color={Colors.primary} />
               <Text style={styles.topUpText}>Top Up Saldo</Text>
@@ -87,7 +84,7 @@ export default function PaymentMethods() {
 
         <TouchableOpacity 
           style={styles.addMethodBtn}
-          onPress={() => Toast.show({ type: 'info', text1: 'Fitur Tambah Metode Segera Hadir' })}
+          onPress={() => showToast('Fitur Tambah Metode Segera Hadir', 'info')}
         >
           <Plus size={20} color={Colors.primary} />
           <Text style={styles.addMethodText}>Tambah Metode Pembayaran</Text>
