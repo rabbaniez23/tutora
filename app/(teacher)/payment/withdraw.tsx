@@ -5,19 +5,20 @@ import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, Landmark, CheckCircle2 } from 'lucide-react-native';
 import Button from '@/src/components/ui/Button';
+import CustomModal from '@/src/components/ui/CustomModal';
 
 export default function TeacherWithdraw() {
   const router = useRouter();
   const [amount, setAmount] = useState('');
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
 
   const handleWithdraw = () => {
     if (!amount || parseInt(amount) < 50000) {
-      Alert.alert('Gagal', 'Minimal pencairan adalah Rp 50.000');
+      setErrorModalVisible(true);
       return;
     }
-    Alert.alert('Berhasil', 'Permintaan pencairan dana sedang diproses oleh sistem.', [
-      { text: 'OK', onPress: () => router.back() }
-    ]);
+    setSuccessModalVisible(true);
   };
 
   return (
@@ -70,6 +71,27 @@ export default function TeacherWithdraw() {
       <View style={styles.footer}>
         <Button title="Konfirmasi Penarikan" onPress={handleWithdraw} />
       </View>
+
+      <CustomModal 
+        visible={errorModalVisible}
+        title="Penarikan Gagal"
+        message="Minimal pencairan adalah Rp 50.000"
+        confirmText="Tutup"
+        onConfirm={() => setErrorModalVisible(false)}
+        variant="danger"
+      />
+
+      <CustomModal 
+        visible={successModalVisible}
+        title="Berhasil"
+        message="Permintaan pencairan dana sedang diproses oleh sistem."
+        confirmText="OK"
+        onConfirm={() => {
+          setSuccessModalVisible(false);
+          router.back();
+        }}
+        variant="primary"
+      />
     </SafeAreaView>
   );
 }

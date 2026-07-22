@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, Video, Play, StopCircle, Upload } from 'lucide-react-native';
 import Button from '@/src/components/ui/Button';
+import CustomModal from '@/src/components/ui/CustomModal';
 import { useAuthStore, TutorStatus } from '@/src/store/useAuthStore';
 
 export default function TeacherVideo() {
@@ -13,6 +14,8 @@ export default function TeacherVideo() {
 
   const [isRecording, setIsRecording] = useState(false);
   const [videoUri, setVideoUri] = useState<string | null>(null);
+  const [submitModalVisible, setSubmitModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleRecordToggle = () => {
     if (isRecording) {
@@ -25,30 +28,17 @@ export default function TeacherVideo() {
   };
 
   const submitApplication = () => {
-    if (Platform.OS === 'web') {
-      const isConfirmed = window.confirm("Apakah Anda yakin data dan video sudah sesuai?");
-      if (isConfirmed) {
-        setTutorStatus('review_video');
-        router.push('/(teacher)/waiting');
-      }
-      return;
-    }
+    setSubmitModalVisible(true);
+  };
 
-    Alert.alert(
-      "Kirim Pendaftaran",
-      "Apakah Anda yakin data dan video sudah sesuai?",
-      [
-        { text: "Batal", style: 'cancel' },
-        { 
-          text: "Kirim", 
-          onPress: () => {
-            // Update auth state tutor menjadi review
-            setTutorStatus('review_video');
-            router.push('/(teacher)/waiting');
-          }
-        }
-      ]
-    )
+  const handleConfirmSubmit = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setSubmitModalVisible(false);
+      setTutorStatus('review_video');
+      router.push('/(teacher)/waiting');
+    }, 1500);
   };
 
   return (
@@ -113,6 +103,18 @@ export default function TeacherVideo() {
           style={!videoUri ? { backgroundColor: Colors.border } : {}}
         />
       </View>
+
+      <CustomModal 
+        visible={submitModalVisible}
+        title="Kirim Pendaftaran"
+        message="Apakah Anda yakin data dan video sudah sesuai?"
+        confirmText="Kirim"
+        cancelText="Batal"
+        onConfirm={handleConfirmSubmit}
+        onCancel={() => setSubmitModalVisible(false)}
+        variant="primary"
+        loading={loading}
+      />
     </SafeAreaView>
   );
 }

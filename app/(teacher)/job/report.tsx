@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { ArrowLeft, Camera, CheckCircle2, UploadCloud } from 'lucide-react-native';
 import Button from '@/src/components/ui/Button';
+import CustomModal from '@/src/components/ui/CustomModal';
 import { useFamilyStore } from '@/src/store/useFamilyStore';
 
 const CHARACTERS = [
@@ -18,6 +19,8 @@ export default function JobReport() {
   const [summary, setSummary] = useState('');
   const [selectedChars, setSelectedChars] = useState<string[]>([]);
   const [photoUploaded, setPhotoUploaded] = useState(false);
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
 
   const toggleChar = (char: string) => {
     if (selectedChars.includes(char)) {
@@ -29,7 +32,7 @@ export default function JobReport() {
 
   const handleSubmit = () => {
     if (!summary || selectedChars.length === 0 || !photoUploaded) {
-      Alert.alert("Laporan Belum Lengkap", "Harap isi ringkasan materi, pilih minimal 1 karakter anak, dan unggah foto bukti.");
+      setErrorModalVisible(true);
       return;
     }
 
@@ -44,9 +47,7 @@ export default function JobReport() {
       photoUrl: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=400&h=300" // Mock image
     });
 
-    Alert.alert("Laporan Terkirim", "Laporan selesai dikirim. Pendapatan sesi telah masuk ke saldo TutorPay Anda.", [
-      { text: "Tutup", onPress: () => router.replace('/(teacher)/(tabs)') }
-    ]);
+    setSuccessModalVisible(true);
   };
 
   return (
@@ -111,6 +112,27 @@ export default function JobReport() {
           onPress={handleSubmit} 
         />
       </View>
+
+      <CustomModal 
+        visible={errorModalVisible}
+        title="Laporan Belum Lengkap"
+        message="Harap isi ringkasan materi, pilih minimal 1 karakter anak, dan unggah foto bukti."
+        confirmText="Tutup"
+        onConfirm={() => setErrorModalVisible(false)}
+        variant="danger"
+      />
+
+      <CustomModal 
+        visible={successModalVisible}
+        title="Laporan Terkirim"
+        message="Laporan selesai dikirim. Pendapatan sesi telah masuk ke saldo TutorPay Anda."
+        confirmText="Tutup"
+        onConfirm={() => {
+          setSuccessModalVisible(false);
+          router.replace('/(teacher)/(tabs)');
+        }}
+        variant="primary"
+      />
     </SafeAreaView>
   );
 }

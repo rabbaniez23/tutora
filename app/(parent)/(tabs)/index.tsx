@@ -6,12 +6,14 @@ import Colors from '@/src/constants/Colors';
 import { useFamilyStore, LearningReport } from '@/src/store/useFamilyStore';
 import { Bell, MapPin, Wallet, PlusCircle, ArrowRight, BarChart2, Calendar, FileText, Download, ChevronDown, ChevronUp } from 'lucide-react-native';
 import Button from '@/src/components/ui/Button';
+import CustomModal from '@/src/components/ui/CustomModal';
 
 const ExpandableReportCard = ({ report }: { report: LearningReport }) => {
   const [expanded, setExpanded] = useState(false);
+  const [downloadModalVisible, setDownloadModalVisible] = useState(false);
 
   const handleDownload = () => {
-    Alert.alert("Unduhan Dimulai", `Laporan_${report.subject.replace(' ', '')}_${report.date}.pdf sedang diunduh ke perangkat Anda.`);
+    setDownloadModalVisible(true);
   };
 
   return (
@@ -66,6 +68,15 @@ const ExpandableReportCard = ({ report }: { report: LearningReport }) => {
           </TouchableOpacity>
         </View>
       )}
+
+      <CustomModal 
+        visible={downloadModalVisible}
+        title="Unduhan Dimulai"
+        message={`Laporan_${report.subject.replace(' ', '')}_${report.date}.pdf sedang diunduh ke perangkat Anda.`}
+        confirmText="Tutup"
+        onConfirm={() => setDownloadModalVisible(false)}
+        variant="primary"
+      />
     </View>
   );
 };
