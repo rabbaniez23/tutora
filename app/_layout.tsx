@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import Toast from "@/src/components/ui/Toast";
 
 export default function RootLayout() {
   return (
@@ -12,6 +13,7 @@ export default function RootLayout() {
         <Stack.Screen name="(customer)" options={{ animation: "fade" }} />
         <Stack.Screen name="(teacher)" options={{ animation: "fade" }} />
       </Stack>
+      <Toast />
     </>
   );
 }

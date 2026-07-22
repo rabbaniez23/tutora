@@ -180,6 +180,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: Platform.OS === 'android' ? 50 : 20,
     paddingBottom: 60, // space for overlapping wallet
+    zIndex: 20, // Ensure header actions like Chat remain clickable
   },
   topNav: {
     flexDirection: 'row',
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
   walletContainer: {
     marginTop: -40, // overlap
     paddingHorizontal: 20,
-    zIndex: 10,
+    zIndex: 30, // Higher than headerBackground
   },
   walletCard: {
     backgroundColor: '#FFF',

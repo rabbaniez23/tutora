@@ -47,12 +47,14 @@ export default function StudySession() {
     setSosModalVisible(true);
   };
 
+  const { showToast } = require('@/src/store/useToastStore').useToastStore.getState();
+
   const handleConfirmSOS = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
       setSosModalVisible(false);
-      // Idealnya bisa memunculkan toast/notifikasi berhasil di sini
+      showToast('Sinyal Darurat Berhasil Dikirim.', 'error');
     }, 1500);
   };
 
@@ -176,7 +178,7 @@ const styles = StyleSheet.create({
   },
   safetyText: { fontSize: 13, color: '#E65100', flex: 1, marginLeft: 12, lineHeight: 20 },
 
-  footer: { padding: 24, backgroundColor: '#FFF', borderTopWidth: 1, borderTopColor: Colors.border },
+  footer: { padding: 24, backgroundColor: '#FFF', borderTopWidth: 1, borderTopColor: Colors.border, zIndex: 99, elevation: 20 },
 
   sosButton: { backgroundColor: '#FF3B30', padding: 16, borderRadius: 30, alignItems: 'center', marginBottom: 16, shadowColor: '#FF3B30', shadowOffset: { width:0, height:4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   sosButtonText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },

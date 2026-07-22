@@ -15,11 +15,14 @@ export default function SettingsScreen() {
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const { showToast } = require('@/src/store/useToastStore').useToastStore.getState();
+
   const handleDeleteAccount = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
       setDeleteModalVisible(false);
+      showToast('Akun berhasil dihapus.', 'info');
       router.replace('/(auth)/login');
     }, 1500);
   };
@@ -29,6 +32,7 @@ export default function SettingsScreen() {
     setTimeout(() => {
       setLoading(false);
       setPasswordModalVisible(false);
+      showToast('Tautan ganti kata sandi telah dikirim ke email Anda.', 'success');
     }, 1000);
   };
 

@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   pinStudent: { position: 'absolute', bottom: '40%', left: '50%' },
   mapWatermark: { fontSize: 24, fontWeight: 'bold', color: '#FFF', position: 'absolute', opacity: 0.5 },
 
-  bottomSheet: { backgroundColor: '#FFF', padding: 24, borderTopLeftRadius: 24, borderTopRightRadius: 24, elevation: 16, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.1, shadowRadius: 12 },
+  bottomSheet: { backgroundColor: '#FFF', padding: 24, borderTopLeftRadius: 24, borderTopRightRadius: 24, elevation: 20, zIndex: 99, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.1, shadowRadius: 12 },
   
   etaContainer: { alignItems: 'center', marginBottom: 24, paddingBottom: 16, borderBottomWidth: 1, borderColor: Colors.surface },
   etaTitle: { fontSize: 16, fontWeight: 'bold', color: Colors.text, marginBottom: 4 },
