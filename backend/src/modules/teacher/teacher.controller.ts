@@ -7,7 +7,10 @@ export async function listTeachersHandler(
   reply: FastifyReply,
 ) {
   const result = await teacherService.listTeachers(request.query);
-  return reply.send(result);
+  return reply.send({
+    message: 'Teachers retrieved successfully',
+    ...result,
+  });
 }
 
 export async function getTeacherDetailHandler(
@@ -15,7 +18,10 @@ export async function getTeacherDetailHandler(
   reply: FastifyReply,
 ) {
   const teacher = await teacherService.getTeacherDetail(request.params.id);
-  return reply.send(teacher);
+  return reply.send({
+    message: 'Teacher detail retrieved successfully',
+    data: teacher,
+  });
 }
 
 export async function toggleOnlineHandler(
@@ -23,7 +29,10 @@ export async function toggleOnlineHandler(
   reply: FastifyReply,
 ) {
   const result = await teacherService.toggleOnline(request.user.id, request.body.isOnline);
-  return reply.send(result);
+  return reply.send({
+    message: `Status updated to ${request.body.isOnline ? 'online' : 'offline'}`,
+    data: result,
+  });
 }
 
 export async function updateLocationHandler(
@@ -35,5 +44,8 @@ export async function updateLocationHandler(
     request.body.latitude,
     request.body.longitude,
   );
-  return reply.send(result);
+  return reply.send({
+    message: 'Location updated successfully',
+    data: result,
+  });
 }

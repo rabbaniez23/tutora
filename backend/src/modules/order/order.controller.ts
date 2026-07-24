@@ -7,7 +7,10 @@ export async function createOrderHandler(
   reply: FastifyReply,
 ) {
   const order = await orderService.createOrder(request.user.id, request.body);
-  return reply.status(201).send(order);
+  return reply.status(201).send({
+    message: 'Order created successfully, searching for tutor...',
+    data: order,
+  });
 }
 
 export async function getOrderHandler(
@@ -15,7 +18,10 @@ export async function getOrderHandler(
   reply: FastifyReply,
 ) {
   const order = await orderService.getOrder(request.params.id);
-  return reply.send(order);
+  return reply.send({
+    message: 'Order retrieved successfully',
+    data: order,
+  });
 }
 
 export async function getActiveOrderHandler(
@@ -23,7 +29,15 @@ export async function getActiveOrderHandler(
   reply: FastifyReply,
 ) {
   const order = await orderService.getActiveOrder(request.user.id);
-  return reply.send(order || { message: 'No active order' });
+
+  if (!order) {
+    return reply.send({ message: 'No active order', data: null });
+  }
+
+  return reply.send({
+    message: 'Active order retrieved successfully',
+    data: order,
+  });
 }
 
 export async function getOrderHistoryHandler(
@@ -33,7 +47,10 @@ export async function getOrderHistoryHandler(
   const page = Number(request.query.page) || 1;
   const limit = Number(request.query.limit) || 20;
   const result = await orderService.getOrderHistory(request.user.id, page, limit);
-  return reply.send(result);
+  return reply.send({
+    message: 'Order history retrieved successfully',
+    ...result,
+  });
 }
 
 export async function cancelOrderHandler(
@@ -41,7 +58,10 @@ export async function cancelOrderHandler(
   reply: FastifyReply,
 ) {
   const result = await orderService.cancelOrder(request.user.id, request.params.id);
-  return reply.send(result);
+  return reply.send({
+    message: 'Order cancelled and refunded successfully',
+    data: result,
+  });
 }
 
 export async function acceptOrderHandler(
@@ -49,7 +69,10 @@ export async function acceptOrderHandler(
   reply: FastifyReply,
 ) {
   const order = await orderService.acceptOrder(request.user.id, request.params.id);
-  return reply.send(order);
+  return reply.send({
+    message: 'Order accepted successfully',
+    data: order,
+  });
 }
 
 export async function rejectOrderHandler(
@@ -57,5 +80,8 @@ export async function rejectOrderHandler(
   reply: FastifyReply,
 ) {
   const result = await orderService.rejectOrder(request.user.id, request.params.id);
-  return reply.send(result);
+  return reply.send({
+    message: 'Order rejected, forwarded to next tutor',
+    data: result,
+  });
 }

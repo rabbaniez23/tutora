@@ -17,7 +17,10 @@ export async function registerHandler(
   reply: FastifyReply,
 ) {
   const result = await authService.register(request.body);
-  return reply.status(201).send(result);
+  return reply.status(201).send({
+    message: 'Registration successful',
+    ...result,
+  });
 }
 
 export async function loginHandler(
@@ -26,7 +29,10 @@ export async function loginHandler(
 ) {
   const { email, password } = request.body;
   const result = await authService.login(email, password);
-  return reply.send(result);
+  return reply.send({
+    message: 'Login successful',
+    ...result,
+  });
 }
 
 export async function logoutHandler(
@@ -42,7 +48,10 @@ export async function refreshHandler(
   reply: FastifyReply,
 ) {
   const result = await authService.refreshToken(request.body.refreshToken);
-  return reply.send(result);
+  return reply.send({
+    message: 'Token refreshed successfully',
+    ...result,
+  });
 }
 
 export async function otpSendHandler(
@@ -66,7 +75,10 @@ export async function teacherRegisterHandler(
   reply: FastifyReply,
 ) {
   const result = await authService.registerTeacher(request.body);
-  return reply.status(201).send(result);
+  return reply.status(201).send({
+    message: 'Teacher registration successful',
+    ...result,
+  });
 }
 
 export async function teacherKycHandler(
@@ -74,7 +86,10 @@ export async function teacherKycHandler(
   reply: FastifyReply,
 ) {
   const result = await authService.submitKyc(request.user.id, request.body);
-  return reply.send(result);
+  return reply.send({
+    message: 'KYC submitted successfully',
+    data: result,
+  });
 }
 
 export async function teacherDocumentsHandler(
@@ -82,7 +97,10 @@ export async function teacherDocumentsHandler(
   reply: FastifyReply,
 ) {
   const result = await authService.submitDocuments(request.user.id, request.body.documentUrls);
-  return reply.send(result);
+  return reply.send({
+    message: 'Documents submitted successfully',
+    data: result,
+  });
 }
 
 export async function teacherVideoHandler(
@@ -90,5 +108,8 @@ export async function teacherVideoHandler(
   reply: FastifyReply,
 ) {
   const result = await authService.submitVideo(request.user.id, request.body.videoUrl);
-  return reply.send(result);
+  return reply.send({
+    message: 'Video submitted successfully, awaiting review',
+    data: result,
+  });
 }

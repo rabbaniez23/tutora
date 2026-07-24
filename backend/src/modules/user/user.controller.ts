@@ -7,7 +7,10 @@ export async function getProfileHandler(
   reply: FastifyReply,
 ) {
   const profile = await userService.getProfile(request.user.id);
-  return reply.send(profile);
+  return reply.send({
+    message: 'Profile retrieved successfully',
+    data: profile,
+  });
 }
 
 export async function updateProfileHandler(
@@ -15,5 +18,8 @@ export async function updateProfileHandler(
   reply: FastifyReply,
 ) {
   const updated = await userService.updateProfile(request.user.id, request.body);
-  return reply.send(updated);
+  return reply.send({
+    message: 'Profile updated successfully',
+    data: updated,
+  });
 }
