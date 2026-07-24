@@ -1,0 +1,10 @@
+export const JWT_ACCESS_EXPIRY = '15m';
+export const JWT_REFRESH_EXPIRY = '7d';
+export const OTP_EXPIRY_MINUTES = 5;
+export const ORDER_TIMEOUT_SECONDS = 15;
+export const GEOFENCE_RADIUS_METERS = 100;
+export const MATCHING_RADIUS_METERS = 5000;
+export const COMMISSION_RATE = 0.15;
+export const MIN_WITHDRAW_AMOUNT = 50000;
+export const TOPUP_FEE = 2000;
+export const WITHDRAW_FEE = 2500;

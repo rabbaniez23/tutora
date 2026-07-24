@@ -1,3 +1,4 @@
+
 # Tutora App — Perencanaan Backend & Arsitektur Teknologi
 
 > Dokumen ini adalah **blueprint teknis** untuk pengembangan backend Tutora ke depan.
@@ -21,21 +22,21 @@ Tutora adalah platform **marketplace on-demand** yang mempertemukan Siswa/Orang 
 
 ### Perbandingan & Keputusan
 
-| Lapisan | Pilihan Lama (Common) | Rekomendasi Tutora | Alasan |
-|---|---|---|---|
-| Backend Runtime | Express.js | **Fastify (Node.js)** | 2-3x lebih cepat dari Express karena schema-based JSON serialization. Cocok untuk API dengan payload JSON besar seperti order data |
-| Database Utama | MySQL / MongoDB | **PostgreSQL + PostGIS** | PostgreSQL adalah gold standard untuk data relasional. PostGIS extension menambahkan kemampuan query geospasial native (jarak antar koordinat, radius matching) tanpa butuh library eksternal |
-| ORM | Sequelize / Mongoose | **Prisma ORM** | Type-safe, auto-generate Typescript types dari schema DB. Developer experience sangat baik dan migrasi database lebih aman dibanding Sequelize |
-| Real-time | Socket.io custom server | **Supabase Realtime** | WebSocket built-in, tidak perlu maintain server Socket.io sendiri. Terintegrasi dengan PostgreSQL via Change Data Capture (CDC). Saat row DB berubah, frontend langsung dapat update |
-| Job Queue | Cron + setTimeout | **BullMQ + Redis (Upstash)** | Timer 15 detik untuk penerimaan order TIDAK BISA pakai setTimeout biasa (akan hilang saat server restart). BullMQ adalah job queue berbasis Redis yang persisten dan reliable |
-| Pembayaran Masuk | Midtrans (standar) | **Midtrans SNAP** | Mendukung semua metode bayar Indonesia: QRIS, Virtual Account, GoPay, OVO, e-wallet dalam satu integrasi SDK |
-| Pembayaran Keluar | Manual transfer | **Xendit Disbursement** | API otomatis untuk transfer ke 100+ bank dan e-wallet di Indonesia. Tutor bisa withdraw kapan saja, proses real-time |
-| Verifikasi Identitas | Manual review | **Privy.id eKYC API** | Spesialis KYC Indonesia, harga terjangkau (Rp 2.000/verifikasi), mendukung KTP + liveness detection (bukan selfie biasa) |
-| Push Notification | OneSignal | **FCM via expo-notifications** | Firebase Cloud Messaging adalah standar industri, gratis, dan terintegrasi mulus dengan Expo. Mendukung background notification untuk SOS dan order baru |
-| Maps & Routing | Mapbox / Leaflet | **Google Maps Platform** | Distance Matrix API untuk menghitung jarak & ETA tutor ke siswa. Directions API untuk routing. Data jalan Indonesia paling akurat dan terupdate |
-| File Storage | AWS S3 | **Supabase Storage** | Sudah satu ekosistem dengan database Supabase. Gratis hingga 1GB, mudah diintegrasikan dengan RLS (Row Level Security) agar hanya pemilik yang bisa akses file sendiri |
-| OTP Verifikasi | Twilio | **Fonnte / Wablas** | WhatsApp OTP jauh lebih familiar di Indonesia daripada SMS. Fonnte harganya Rp 150-250/pesan vs Twilio yang mahal dalam kurs USD |
-| Auth Token | Session Cookie | **JWT + Refresh Token** | Stateless, cocok untuk mobile app. Access token berumur pendek (15 menit), refresh token disimpan di database untuk bisa di-revoke |
+| Lapisan              | Pilihan Lama (Common)   | Rekomendasi Tutora                   | Alasan                                                                                                                                                                                        |
+| -------------------- | ----------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend Runtime      | Express.js              | **Fastify (Node.js)**          | 2-3x lebih cepat dari Express karena schema-based JSON serialization. Cocok untuk API dengan payload JSON besar seperti order data                                                            |
+| Database Utama       | MySQL / MongoDB         | **PostgreSQL + PostGIS**       | PostgreSQL adalah gold standard untuk data relasional. PostGIS extension menambahkan kemampuan query geospasial native (jarak antar koordinat, radius matching) tanpa butuh library eksternal |
+| ORM                  | Sequelize / Mongoose    | **Prisma ORM**                 | Type-safe, auto-generate Typescript types dari schema DB. Developer experience sangat baik dan migrasi database lebih aman dibanding Sequelize                                                |
+| Real-time            | Socket.io custom server | **Supabase Realtime**          | WebSocket built-in, tidak perlu maintain server Socket.io sendiri. Terintegrasi dengan PostgreSQL via Change Data Capture (CDC). Saat row DB berubah, frontend langsung dapat update          |
+| Job Queue            | Cron + setTimeout       | **BullMQ + Redis (Upstash)**   | Timer 15 detik untuk penerimaan order TIDAK BISA pakai setTimeout biasa (akan hilang saat server restart). BullMQ adalah job queue berbasis Redis yang persisten dan reliable                 |
+| Pembayaran Masuk     | Midtrans (standar)      | **Midtrans SNAP**              | Mendukung semua metode bayar Indonesia: QRIS, Virtual Account, GoPay, OVO, e-wallet dalam satu integrasi SDK                                                                                  |
+| Pembayaran Keluar    | Manual transfer         | **Xendit Disbursement**        | API otomatis untuk transfer ke 100+ bank dan e-wallet di Indonesia. Tutor bisa withdraw kapan saja, proses real-time                                                                          |
+| Verifikasi Identitas | Manual review           | **Privy.id eKYC API**          | Spesialis KYC Indonesia, harga terjangkau (Rp 2.000/verifikasi), mendukung KTP + liveness detection (bukan selfie biasa)                                                                      |
+| Push Notification    | OneSignal               | **FCM via expo-notifications** | Firebase Cloud Messaging adalah standar industri, gratis, dan terintegrasi mulus dengan Expo. Mendukung background notification untuk SOS dan order baru                                      |
+| Maps & Routing       | Mapbox / Leaflet        | **Google Maps Platform**       | Distance Matrix API untuk menghitung jarak & ETA tutor ke siswa. Directions API untuk routing. Data jalan Indonesia paling akurat dan terupdate                                               |
+| File Storage         | AWS S3                  | **Supabase Storage**           | Sudah satu ekosistem dengan database Supabase. Gratis hingga 1GB, mudah diintegrasikan dengan RLS (Row Level Security) agar hanya pemilik yang bisa akses file sendiri                        |
+| OTP Verifikasi       | Twilio                  | **Fonnte / Wablas**            | WhatsApp OTP jauh lebih familiar di Indonesia daripada SMS. Fonnte harganya Rp 150-250/pesan vs Twilio yang mahal dalam kurs USD                                                              |
+| Auth Token           | Session Cookie          | **JWT + Refresh Token**        | Stateless, cocok untuk mobile app. Access token berumur pendek (15 menit), refresh token disimpan di database untuk bisa di-revoke                                                            |
 
 ---
 
@@ -84,6 +85,7 @@ Tutora adalah platform **marketplace on-demand** yang mempertemukan Siswa/Orang 
 ### Tabel Inti
 
 #### `users`
+
 ```
 id              UUID        PRIMARY KEY
 role            ENUM        ['student', 'teacher', 'parent']
@@ -97,6 +99,7 @@ created_at      TIMESTAMP
 ```
 
 #### `teacher_profiles`
+
 ```
 id              UUID        PRIMARY KEY (ref users.id)
 nik             VARCHAR     UNIQUE
@@ -117,6 +120,7 @@ location        GEOMETRY(POINT, 4326)   -- PostGIS: koordinat real-time
 ```
 
 #### `parent_children`
+
 ```
 id              UUID        PRIMARY KEY
 parent_id       UUID        (ref users.id)
@@ -126,6 +130,7 @@ tutorpay_balance BIGINT     (dalam satuan Rupiah)
 ```
 
 #### `orders`
+
 ```
 id              UUID        PRIMARY KEY
 student_id      UUID        (ref users.id atau parent_children.id)
@@ -148,6 +153,7 @@ created_at      TIMESTAMP
 ```
 
 #### `sessions`
+
 ```
 id              UUID        PRIMARY KEY
 order_id        UUID        (ref orders.id)
@@ -158,6 +164,7 @@ geo_distance_m  INTEGER     (jarak saat tombol mulai ditekan, dalam meter)
 ```
 
 #### `learning_reports`
+
 ```
 id              UUID        PRIMARY KEY
 session_id      UUID        (ref sessions.id)
@@ -170,6 +177,7 @@ submitted_at    TIMESTAMP
 ```
 
 #### `transactions`
+
 ```
 id              UUID        PRIMARY KEY
 order_id        UUID
@@ -182,6 +190,7 @@ created_at      TIMESTAMP
 ```
 
 #### `reviews`
+
 ```
 id              UUID        PRIMARY KEY
 order_id        UUID
@@ -199,60 +208,65 @@ created_at      TIMESTAMP
 ## Rancangan API Endpoints (REST)
 
 ### Auth Service
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| POST | `/auth/register` | Daftar akun baru (student/parent) |
-| POST | `/auth/teacher/register` | Step 1: Biodata tutor |
-| POST | `/auth/teacher/kyc` | Step 2: Submit foto KTP ke Privy.id |
-| POST | `/auth/teacher/documents` | Step 3: Upload dokumen |
-| POST | `/auth/teacher/video` | Step 4: Upload video perkenalan |
-| POST | `/auth/login` | Login, dapat JWT |
-| POST | `/auth/otp/send` | Kirim OTP WhatsApp |
-| POST | `/auth/otp/verify` | Verifikasi OTP |
-| POST | `/auth/refresh` | Refresh JWT token |
+
+| Method | Endpoint                    | Deskripsi                           |
+| ------ | --------------------------- | ----------------------------------- |
+| POST   | `/auth/register`          | Daftar akun baru (student/parent)   |
+| POST   | `/auth/teacher/register`  | Step 1: Biodata tutor               |
+| POST   | `/auth/teacher/kyc`       | Step 2: Submit foto KTP ke Privy.id |
+| POST   | `/auth/teacher/documents` | Step 3: Upload dokumen              |
+| POST   | `/auth/teacher/video`     | Step 4: Upload video perkenalan     |
+| POST   | `/auth/login`             | Login, dapat JWT                    |
+| POST   | `/auth/otp/send`          | Kirim OTP WhatsApp                  |
+| POST   | `/auth/otp/verify`        | Verifikasi OTP                      |
+| POST   | `/auth/refresh`           | Refresh JWT token                   |
 
 ### Order Service
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| POST | `/orders` | Buat order baru |
-| GET | `/orders/:id` | Detail order |
-| PATCH | `/orders/:id/cancel` | Batalkan order |
-| GET | `/orders/active` | Order aktif user saat ini |
-| POST | `/orders/:id/accept` | Tutor terima order (15 detik window) |
-| POST | `/orders/:id/reject` | Tutor tolak order |
-| POST | `/sessions/:id/start` | Mulai sesi (setelah geo-fence valid) |
-| POST | `/sessions/:id/end` | Akhiri sesi |
-| POST | `/sessions/:id/report` | Submit laporan ajar |
-| POST | `/sessions/:id/review` | Submit ulasan dari siswa |
+
+| Method | Endpoint                 | Deskripsi                            |
+| ------ | ------------------------ | ------------------------------------ |
+| POST   | `/orders`              | Buat order baru                      |
+| GET    | `/orders/:id`          | Detail order                         |
+| PATCH  | `/orders/:id/cancel`   | Batalkan order                       |
+| GET    | `/orders/active`       | Order aktif user saat ini            |
+| POST   | `/orders/:id/accept`   | Tutor terima order (15 detik window) |
+| POST   | `/orders/:id/reject`   | Tutor tolak order                    |
+| POST   | `/sessions/:id/start`  | Mulai sesi (setelah geo-fence valid) |
+| POST   | `/sessions/:id/end`    | Akhiri sesi                          |
+| POST   | `/sessions/:id/report` | Submit laporan ajar                  |
+| POST   | `/sessions/:id/review` | Submit ulasan dari siswa             |
 
 ### User & Family Service
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| GET | `/users/me` | Profil saya |
-| PATCH | `/users/me` | Update profil |
-| GET | `/teachers` | Daftar tutor tersedia (filter by location, subject) |
-| GET | `/teachers/:id` | Detail profil tutor + ulasan |
-| POST | `/parent/children` | Tambah profil anak |
-| GET | `/parent/children` | Daftar anak saya |
-| GET | `/parent/children/:childId/orders` | Histori order anak tertentu |
+
+| Method | Endpoint                             | Deskripsi                                           |
+| ------ | ------------------------------------ | --------------------------------------------------- |
+| GET    | `/users/me`                        | Profil saya                                         |
+| PATCH  | `/users/me`                        | Update profil                                       |
+| GET    | `/teachers`                        | Daftar tutor tersedia (filter by location, subject) |
+| GET    | `/teachers/:id`                    | Detail profil tutor + ulasan                        |
+| POST   | `/parent/children`                 | Tambah profil anak                                  |
+| GET    | `/parent/children`                 | Daftar anak saya                                    |
+| GET    | `/parent/children/:childId/orders` | Histori order anak tertentu                         |
 
 ### Payment Service
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| POST | `/payments/topup` | Buat transaksi top up (Midtrans) |
-| POST | `/payments/withdraw` | Request disbursement tutor (Xendit) |
-| GET | `/wallet/balance` | Saldo TutorPay saya |
-| GET | `/wallet/transactions` | Riwayat transaksi |
-| POST | `/webhooks/midtrans` | Webhook dari Midtrans saat bayar |
-| POST | `/webhooks/xendit` | Webhook dari Xendit disbursement |
+
+| Method | Endpoint                 | Deskripsi                           |
+| ------ | ------------------------ | ----------------------------------- |
+| POST   | `/payments/topup`      | Buat transaksi top up (Midtrans)    |
+| POST   | `/payments/withdraw`   | Request disbursement tutor (Xendit) |
+| GET    | `/wallet/balance`      | Saldo TutorPay saya                 |
+| GET    | `/wallet/transactions` | Riwayat transaksi                   |
+| POST   | `/webhooks/midtrans`   | Webhook dari Midtrans saat bayar    |
+| POST   | `/webhooks/xendit`     | Webhook dari Xendit disbursement    |
 
 ### Real-time Events (WebSocket via Supabase)
-| Channel | Event | Payload |
-|---------|-------|---------|
-| `order:{orderId}` | `status_changed` | Status order baru |
-| `teacher:{teacherId}` | `new_order` | Ada order masuk baru (15 detik) |
-| `session:{sessionId}` | `teacher_location` | Koordinat GPS tutor terbaru |
-| `parent:{parentId}` | `sos_alert` | Kirim data SOS dari anak |
+
+| Channel                 | Event                | Payload                         |
+| ----------------------- | -------------------- | ------------------------------- |
+| `order:{orderId}`     | `status_changed`   | Status order baru               |
+| `teacher:{teacherId}` | `new_order`        | Ada order masuk baru (15 detik) |
+| `session:{sessionId}` | `teacher_location` | Koordinat GPS tutor terbaru     |
+| `parent:{parentId}`   | `sos_alert`        | Kirim data SOS dari anak        |
 
 ---
 
@@ -260,23 +274,23 @@ created_at      TIMESTAMP
 
 ### Fase 1 — MVP (Bisa pakai Free Tier saat lomba)
 
-| Komponen | Platform | Biaya Estimasi |
-|----------|----------|----------------|
-| Backend API | **Railway.app** / Render.com | Gratis s.d. $5/bln |
-| Database | **Supabase** (PostgreSQL) | Gratis s.d. 500MB |
-| Redis | **Upstash** | Gratis 10.000 command/hari |
-| File Storage | **Supabase Storage** | Gratis s.d. 1GB |
-| Domain | Freenom / Namecheap | Rp 0 - Rp 100rb/thn |
+| Komponen     | Platform                           | Biaya Estimasi             |
+| ------------ | ---------------------------------- | -------------------------- |
+| Backend API  | **Railway.app** / Render.com | Gratis s.d. $5/bln         |
+| Database     | **Supabase** (PostgreSQL)    | Gratis s.d. 500MB          |
+| Redis        | **Upstash**                  | Gratis 10.000 command/hari |
+| File Storage | **Supabase Storage**         | Gratis s.d. 1GB            |
+| Domain       | Freenom / Namecheap                | Rp 0 - Rp 100rb/thn        |
 
 ### Fase 2 — Peluncuran Komersial
 
-| Komponen | Platform | Biaya |
-|----------|----------|-------|
-| Backend + Queue | VPS **Vultr / DigitalOcean** 4 CPU | ~$48/bln |
-| Database | Supabase Pro / self-hosted PostgreSQL | $25/bln |
-| Redis | Upstash Pro (500rb command) | $10/bln |
-| CDN & File | Cloudflare R2 | $0.015/GB |
-| Monitoring | **Sentry** (error tracking) + **BetterUptime** | Gratis - $20/bln |
+| Komponen        | Platform                                                   | Biaya            |
+| --------------- | ---------------------------------------------------------- | ---------------- |
+| Backend + Queue | VPS**Vultr / DigitalOcean** 4 CPU                    | ~$48/bln         |
+| Database        | Supabase Pro / self-hosted PostgreSQL                      | $25/bln          |
+| Redis           | Upstash Pro (500rb command)                                | $10/bln          |
+| CDN & File      | Cloudflare R2                                              | $0.015/GB        |
+| Monitoring      | **Sentry** (error tracking) + **BetterUptime** | Gratis - $20/bln |
 
 ---
 
@@ -311,6 +325,7 @@ Saat sesi selesai dan laporan disubmit:
 ### TutorPass / TutorBoost (Subscription)
 
 Tabel `subscriptions` menyimpan paket aktif user. Middleware API akan membaca tabel ini sebelum melakukan matching untuk menentukan:
+
 - Apakah siswa dapat akses *priority matching* (TutorPass Plus)
 - Apakah tutor dapat *visibility boost* dalam hasil pencarian (TutorBoost Pro)
 
@@ -318,10 +333,10 @@ Tabel `subscriptions` menyimpan paket aktif user. Middleware API akan membaca ta
 
 ## Estimasi Proyeksi Pendapatan
 
-| Skenario | Sesi/Hari | Komisi Rata-rata | Pendapatan/Hari | Pendapatan/Bulan |
-|----------|-----------|-----------------|-----------------|------------------|
-| Early Adopter | 50 | Rp 9.000 - 12.000 | Rp 450rb - 600rb | **Rp 13,5 jt - 18 jt** |
-| Growth Stage | 500 | Rp 10.000 | Rp 5 jt | **Rp 150 jt** |
-| Scale Stage | 5.000 | Rp 10.000 | Rp 50 jt | **Rp 1,5 M** |
+| Skenario      | Sesi/Hari | Komisi Rata-rata  | Pendapatan/Hari  | Pendapatan/Bulan             |
+| ------------- | --------- | ----------------- | ---------------- | ---------------------------- |
+| Early Adopter | 50        | Rp 9.000 - 12.000 | Rp 450rb - 600rb | **Rp 13,5 jt - 18 jt** |
+| Growth Stage  | 500       | Rp 10.000         | Rp 5 jt          | **Rp 150 jt**          |
+| Scale Stage   | 5.000     | Rp 10.000         | Rp 50 jt         | **Rp 1,5 M**           |
 
 *Belum termasuk pendapatan pasif TutorPay (top up fee, withdraw fee) dan revenue langganan membership.*

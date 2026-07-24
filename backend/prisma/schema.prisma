@@ -1,0 +1,469 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  STUDENT
+  TEACHER
+  PARENT
+  ADMIN
+}
+
+enum KycStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum OnboardStatus {
+  DRAFT
+  REVIEW_VIDEO
+  INTERVIEW
+  APPROVED
+  REJECTED
+}
+
+enum MembershipTier {
+  JUNIOR
+  PROFESSIONAL
+}
+
+enum OrderStatus {
+  SEARCHING
+  MATCHED
+  ON_THE_WAY
+  ARRIVED
+  ACTIVE
+  DONE
+  CANCELLED
+}
+
+enum ScheduleType {
+  NOW
+  SCHEDULED
+}
+
+enum TransactionType {
+  CHARGE
+  DISBURSEMENT
+  TOPUP
+  REFUND
+  PLATFORM_FEE
+  HOLD
+  RELEASE
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum EducationLevel {
+  SD
+  SMP
+  SMA
+}
+
+enum NotificationType {
+  ORDER_NEW
+  ORDER_ACCEPTED
+  TUTOR_ARRIVING
+  SESSION_STARTED
+  SESSION_ENDED
+  REPORT_SUBMITTED
+  SOS_ALERT
+  PAYMENT_SUCCESS
+  WITHDRAW_COMPLETE
+  PROMO
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  role         Role
+  name         String
+  email        String   @unique
+  phone        String   @unique
+  passwordHash String
+  phoneVerified Boolean @default(false)
+  avatarUrl    String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  teacherProfile        TeacherProfile?
+  wallet                Wallet?
+  orderedOrders         Order[]              @relation("OrderedBy")
+  studentOrders         Order[]              @relation("StudentOrders")
+  teacherOrders         Order[]              @relation("TeacherOrders")
+  parentChildren        ParentChild[]
+  refreshTokens         RefreshToken[]
+  reviewsGiven          Review[]             @relation("Reviewer")
+  transactions          Transaction[]
+  notifications         Notification[]
+  fcmTokens             FcmToken[]
+  chatRoomMembers       ChatRoomMember[]
+  messages              Message[]
+  sosAlerts             SosAlert[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model TeacherProfile {
+  id             String         @id @default(uuid()) @db.Uuid
+  nik            String?
+  ktpPhotoUrl    String?        @map("ktp_photo_url")
+  university     String?
+  major          String?
+  yearEnrolled   Int?           @map("year_enrolled")
+  gpa            Float?
+  subjects       String[]
+  bio            String?
+  profilePhoto   String?        @map("profile_photo")
+  kycStatus      KycStatus      @default(PENDING) @map("kyc_status")
+  onboardStatus  OnboardStatus  @default(DRAFT) @map("onboard_status")
+  videoUrl       String?        @map("video_url")
+  membershipTier MembershipTier @default(JUNIOR) @map("membership_tier")
+  averageRating  Float          @default(0) @map("average_rating")
+  totalReviews   Int            @default(0) @map("total_reviews")
+  totalSessions  Int            @default(0) @map("total_sessions")
+  latitude       Float?
+  longitude      Float?
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  user         User                @relation(fields: [id], references: [id], onDelete: Cascade)
+  availability TeacherAvailability?
+  reviews      Review[]            @relation("TeacherReview")
+  reports      LearningReport[]
+
+  @@index([kycStatus])
+  @@index([onboardStatus])
+  @@map("teacher_profiles")
+}
+
+model TeacherAvailability {
+  id           String    @id @default(uuid()) @db.Uuid
+  teacherId    String    @unique @map("teacher_id") @db.Uuid
+  isOnline     Boolean   @default(false) @map("is_online")
+  lastOnlineAt DateTime? @map("last_online_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  teacher TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@map("teacher_availability")
+}
+
+model Wallet {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @map("user_id") @db.Uuid
+  balance   BigInt   @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@map("wallets")
+}
+
+model ParentChild {
+  id         String  @id @default(uuid()) @db.Uuid
+  parentId   String  @map("parent_id") @db.Uuid
+  childName  String  @map("child_name")
+  childGrade String  @map("child_grade")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  parent User @relation(fields: [parentId], references: [id], onDelete: Cascade)
+
+  @@index([parentId])
+  @@map("parent_children")
+}
+
+model Order {
+  id              String       @id @default(uuid()) @db.Uuid
+  studentId       String       @map("student_id") @db.Uuid
+  orderedById     String       @map("ordered_by_id") @db.Uuid
+  teacherId       String?      @map("teacher_id") @db.Uuid
+  subject         String
+  level           EducationLevel
+  durationHours   Float        @map("duration_hours")
+  sessionsTotal   Int          @map("sessions_total")
+  sessionNumber   Int          @default(0) @map("session_number")
+  status          OrderStatus  @default(SEARCHING)
+  latitude        Float
+  longitude       Float
+  addressText     String       @map("address_text")
+  scheduleType    ScheduleType @map("schedule_type")
+  scheduledAt     DateTime?    @map("scheduled_at")
+  basePrice       BigInt       @map("base_price")
+  discountAmount  BigInt       @default(0) @map("discount_amount")
+  finalPrice      BigInt       @map("final_price")
+  voucherCode     String?      @map("voucher_code")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  student  User          @relation("StudentOrders", fields: [studentId], references: [id])
+  orderedBy User         @relation("OrderedBy", fields: [orderedById], references: [id])
+  teacher  User?         @relation("TeacherOrders", fields: [teacherId], references: [id])
+  sessions Session[]
+  reviews  Review[]
+  transactions Transaction[]
+  chatRoom ChatRoom?
+
+  @@index([status])
+  @@index([studentId])
+  @@index([teacherId])
+  @@index([orderedById])
+  @@map("orders")
+}
+
+model Session {
+  id             String   @id @default(uuid()) @db.Uuid
+  orderId        String   @map("order_id") @db.Uuid
+  startedAt      DateTime @map("started_at")
+  endedAt        DateTime? @map("ended_at")
+  geoConfirmed   Boolean  @default(false) @map("geo_confirmed")
+  geoDistanceM    Float?   @map("geo_distance_m")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  order    Order            @relation(fields: [orderId], references: [id])
+  reports  LearningReport[]
+  reviews  Review[]
+  sosAlerts SosAlert[]
+
+  @@index([orderId])
+  @@map("sessions")
+}
+
+model LearningReport {
+  id          String   @id @default(uuid()) @db.Uuid
+  sessionId   String   @map("session_id") @db.Uuid
+  teacherId   String   @map("teacher_id") @db.Uuid
+  studentId   String   @map("student_id") @db.Uuid
+  summary     String
+  characters  String[]
+  photoUrl    String?  @map("photo_url")
+  submittedAt DateTime @map("submitted_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  session Session @relation(fields: [sessionId], references: [id])
+  teacher TeacherProfile @relation(fields: [teacherId], references: [id])
+
+  @@index([sessionId])
+  @@index([studentId])
+  @@map("learning_reports")
+}
+
+model Review {
+  id         String   @id @default(uuid()) @db.Uuid
+  orderId    String   @map("order_id") @db.Uuid
+  sessionId  String?  @map("session_id") @db.Uuid
+  reviewerId String   @map("reviewer_id") @db.Uuid
+  teacherId  String   @map("teacher_id") @db.Uuid
+  rating     Int
+  content    String
+  tags       String[]
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  order    Order           @relation(fields: [orderId], references: [id])
+  session  Session?        @relation(fields: [sessionId], references: [id])
+  reviewer User            @relation("Reviewer", fields: [reviewerId], references: [id])
+  teacher  TeacherProfile  @relation("TeacherReview", fields: [teacherId], references: [id])
+
+  @@index([teacherId])
+  @@index([orderId])
+  @@map("reviews")
+}
+
+model Transaction {
+  id          String            @id @default(uuid()) @db.Uuid
+  orderId     String?           @map("order_id") @db.Uuid
+  userId      String            @map("user_id") @db.Uuid
+  walletId    String            @map("wallet_id") @db.Uuid
+  type        TransactionType
+  amount      BigInt
+  gateway     String?
+  gatewayRefId String?          @map("gateway_ref_id")
+  status      TransactionStatus @default(PENDING)
+  description String?
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  order  Order?  @relation(fields: [orderId], references: [id])
+  user   User    @relation(fields: [userId], references: [id])
+  wallet Wallet  @relation(fields: [walletId], references: [id])
+
+  @@index([userId])
+  @@index([walletId])
+  @@index([orderId])
+  @@index([status])
+  @@map("transactions")
+}
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  type      NotificationType
+  title     String
+  body      String
+  data      Json?
+  isRead    Boolean          @default(false) @map("is_read")
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+model FcmToken {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  token      String   @unique
+  deviceInfo String?  @map("device_info")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("fcm_tokens")
+}
+
+model ChatRoom {
+  id            String    @id @default(uuid()) @db.Uuid
+  orderId       String    @unique @map("order_id") @db.Uuid
+  isActive      Boolean   @default(true) @map("is_active")
+  deactivatedAt DateTime? @map("deactivated_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  order   Order              @relation(fields: [orderId], references: [id])
+  members ChatRoomMember[]
+  messages Message[]
+
+  @@map("chat_rooms")
+}
+
+model ChatRoomMember {
+  id         String   @id @default(uuid()) @db.Uuid
+  chatRoomId String   @map("chat_room_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chatRoomId, userId])
+  @@map("chat_room_members")
+}
+
+model Message {
+  id         String   @id @default(uuid()) @db.Uuid
+  chatRoomId String   @map("chat_room_id") @db.Uuid
+  senderId   String   @map("sender_id") @db.Uuid
+  content    String
+  isRead     Boolean  @default(false) @map("is_read")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  sender   User     @relation(fields: [senderId], references: [id])
+
+  @@index([chatRoomId])
+  @@index([senderId])
+  @@map("messages")
+}
+
+model Promotion {
+  id              String       @id @default(uuid()) @db.Uuid
+  title           String
+  description     String?
+  discountType    DiscountType @map("discount_type")
+  discountValue   Float        @map("discount_value")
+  minOrderAmount  BigInt       @default(0) @map("min_order_amount")
+  maxDiscount     BigInt?      @map("max_discount")
+  startDate       DateTime     @map("start_date")
+  endDate         DateTime     @map("end_date")
+  isActive        Boolean      @default(true) @map("is_active")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  vouchers Voucher[]
+
+  @@index([isActive])
+  @@map("promotions")
+}
+
+model Voucher {
+  id           String   @id @default(uuid()) @db.Uuid
+  code         String   @unique
+  promotionId  String   @map("promotion_id") @db.Uuid
+  maxUsage     Int      @default(0) @map("max_usage")
+  currentUsage Int      @default(0) @map("current_usage")
+  expiresAt    DateTime @map("expires_at")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  promotion Promotion @relation(fields: [promotionId], references: [id])
+
+  @@index([code])
+  @@index([promotionId])
+  @@map("vouchers")
+}
+
+model SosAlert {
+  id          String    @id @default(uuid()) @db.Uuid
+  sessionId   String    @map("session_id") @db.Uuid
+  triggeredBy String    @map("triggered_by") @db.Uuid
+  latitude    Float
+  longitude   Float
+  resolvedAt  DateTime? @map("resolved_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  session  Session @relation(fields: [sessionId], references: [id])
+  trigger  User    @relation(fields: [triggeredBy], references: [id])
+
+  @@index([sessionId])
+  @@map("sos_alerts")
+}
