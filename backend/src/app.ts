@@ -6,6 +6,7 @@ import swaggerUi from '@fastify/swagger-ui';
 import { authRoutes } from '@/modules/auth/auth.routes';
 import { userRoutes } from '@/modules/user/user.routes';
 import { teacherRoutes } from '@/modules/teacher/teacher.routes';
+import { orderRoutes } from '@/modules/order/order.routes';
 import { errorHandler } from '@/shared/middleware/error-handler';
 
 export async function buildApp() {
@@ -64,6 +65,7 @@ export async function buildApp() {
   await app.register(authRoutes);
   await app.register(userRoutes);
   await app.register(teacherRoutes);
+  await app.register(orderRoutes);
 
   return app;
 }
