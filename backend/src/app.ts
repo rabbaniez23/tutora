@@ -3,6 +3,8 @@ import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
+import { authRoutes } from '@/modules/auth/auth.routes';
+import { errorHandler } from '@/shared/middleware/error-handler';
 
 export async function buildApp() {
   const app = Fastify({
@@ -32,6 +34,15 @@ export async function buildApp() {
           description: 'Development server',
         },
       ],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+          },
+        },
+      },
     },
   });
 
@@ -39,12 +50,16 @@ export async function buildApp() {
     routePrefix: '/docs',
   });
 
+  app.setErrorHandler(errorHandler);
+
   app.get('/health', async () => {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),
     };
   });
+
+  await app.register(authRoutes);
 
   return app;
 }

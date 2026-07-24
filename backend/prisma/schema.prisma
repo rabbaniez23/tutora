@@ -99,9 +99,11 @@ model User {
   name         String
   email        String   @unique
   phone        String   @unique
-  passwordHash String
-  phoneVerified Boolean @default(false)
-  avatarUrl    String?
+  passwordHash  String
+  phoneVerified Boolean  @default(false)
+  otpCode       String?  @map("otp_code")
+  otpExpiresAt  DateTime? @map("otp_expires_at")
+  avatarUrl     String?
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
   deletedAt    DateTime? @map("deleted_at")
