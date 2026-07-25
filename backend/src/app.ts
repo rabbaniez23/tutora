@@ -7,7 +7,10 @@ import { authRoutes } from '@/modules/auth/auth.routes';
 import { userRoutes } from '@/modules/user/user.routes';
 import { teacherRoutes } from '@/modules/teacher/teacher.routes';
 import { orderRoutes } from '@/modules/order/order.routes';
+import { sessionRoutes } from '@/modules/session/session.routes';
+import { walletRoutes } from '@/modules/wallet/wallet.routes';
 import { errorHandler } from '@/shared/middleware/error-handler';
+import { socketPlugin } from '@/shared/plugins/socket.plugin';
 
 export async function buildApp() {
   const app = Fastify({
@@ -53,6 +56,9 @@ export async function buildApp() {
     routePrefix: '/docs',
   });
 
+  // Socket.IO
+  await app.register(socketPlugin);
+
   app.setErrorHandler(errorHandler);
 
   app.get('/health', async () => {
@@ -62,10 +68,13 @@ export async function buildApp() {
     };
   });
 
+  // API Routes
   await app.register(authRoutes);
   await app.register(userRoutes);
   await app.register(teacherRoutes);
   await app.register(orderRoutes);
+  await app.register(sessionRoutes);
+  await app.register(walletRoutes);
 
   return app;
 }
