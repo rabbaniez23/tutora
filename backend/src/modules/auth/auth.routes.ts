@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { authenticate } from '@/shared/middleware/authenticate';
 import { authorize } from '@/shared/middleware/authorize';
+import { authRateLimit, otpRateLimit } from '@/shared/middleware/rate-limit';
 import {
   registerSchema,
   loginSchema,
@@ -44,7 +45,7 @@ export async function authRoutes(app: FastifyInstance) {
       },
       response: { 201: { type: 'object' } },
     },
-    preHandler: [async (req, reply) => { registerSchema.parse(req.body); }],
+    preHandler: [authRateLimit(10, 60000), async (req, reply) => { registerSchema.parse(req.body); }],
     handler: registerHandler,
   });
 
@@ -63,7 +64,7 @@ export async function authRoutes(app: FastifyInstance) {
       },
       response: { 200: { type: 'object' } },
     },
-    preHandler: [async (req, reply) => { loginSchema.parse(req.body); }],
+    preHandler: [authRateLimit(10, 60000), async (req, reply) => { loginSchema.parse(req.body); }],
     handler: loginHandler,
   });
 
@@ -120,7 +121,7 @@ export async function authRoutes(app: FastifyInstance) {
       },
       response: { 200: { type: 'object' } },
     },
-    preHandler: [async (req, reply) => { otpSendSchema.parse(req.body); }],
+    preHandler: [otpRateLimit(3, 600000), async (req, reply) => { otpSendSchema.parse(req.body); }],
     handler: otpSendHandler,
   });
 
@@ -139,7 +140,7 @@ export async function authRoutes(app: FastifyInstance) {
       },
       response: { 200: { type: 'object' } },
     },
-    preHandler: [async (req, reply) => { otpVerifySchema.parse(req.body); }],
+    preHandler: [otpRateLimit(3, 600000), async (req, reply) => { otpVerifySchema.parse(req.body); }],
     handler: otpVerifyHandler,
   });
 

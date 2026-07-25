@@ -13,8 +13,10 @@ import { paymentRoutes } from '@/modules/payment/payment.routes';
 import { chatRoutes } from '@/modules/chat/chat.routes';
 import { familyRoutes } from '@/modules/family/family.routes';
 import { notificationRoutes } from '@/modules/notification/notification.routes';
+import { adminRoutes } from '@/modules/admin/admin.routes';
 import { errorHandler } from '@/shared/middleware/error-handler';
 import { socketPlugin } from '@/shared/plugins/socket.plugin';
+import { globalRateLimit } from '@/shared/middleware/rate-limit';
 
 export async function buildApp() {
   const app = Fastify({
@@ -23,8 +25,26 @@ export async function buildApp() {
     },
   });
 
+  // CORS
+  const allowedOrigins = [
+    'http://localhost:8081',
+    'http://localhost:19006',
+    'http://localhost:19000',
+    'exp://',
+  ];
+
+  if (process.env.CORS_ORIGIN) {
+    allowedOrigins.push(process.env.CORS_ORIGIN);
+  }
+
   await app.register(cors, {
-    origin: true,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.some((o) => origin.startsWith(o))) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'), false);
+      }
+    },
     credentials: true,
   });
 
@@ -37,11 +57,19 @@ export async function buildApp() {
         title: 'Tutora API',
         description: 'Backend API for Tutora - on-demand tutor marketplace',
         version: '1.0.0',
+        contact: {
+          name: 'Tutora Team',
+          email: 'api@tutora.id',
+        },
       },
       servers: [
         {
           url: 'http://localhost:3000',
           description: 'Development server',
+        },
+        {
+          url: 'https://api.tutora.id',
+          description: 'Production server',
         },
       ],
       components: {
@@ -63,6 +91,9 @@ export async function buildApp() {
   // Socket.IO
   await app.register(socketPlugin);
 
+  // Global rate limit
+  await app.addHook('onRequest', globalRateLimit(100, 60000));
+
   app.setErrorHandler(errorHandler);
 
   app.get('/health', async () => {
@@ -83,6 +114,7 @@ export async function buildApp() {
   await app.register(chatRoutes);
   await app.register(familyRoutes);
   await app.register(notificationRoutes);
+  await app.register(adminRoutes);
 
   return app;
 }

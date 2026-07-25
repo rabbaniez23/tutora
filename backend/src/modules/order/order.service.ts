@@ -277,13 +277,10 @@ export async function acceptOrder(teacherId: string, orderId: string) {
 
   // Cancel timeout job
   const { orderQueue } = await import('@/jobs/queue');
-  const jobIds = await orderQueue.getJobIds('delayed', 0, 100);
-  for (const jobId of jobIds) {
-    if (jobId.includes(orderId)) {
-      const job = await orderQueue.getJob(jobId);
-      if (job) {
-        await job.remove();
-      }
+  const jobs = await orderQueue.getJobs(['delayed'], 0, 100);
+  for (const job of jobs) {
+    if (job.id?.includes(orderId)) {
+      await job.remove();
     }
   }
 
@@ -323,13 +320,10 @@ export async function rejectOrder(teacherId: string, orderId: string) {
 
   // Cancel timeout job for this tutor
   const { orderQueue } = await import('@/jobs/queue');
-  const jobIds = await orderQueue.getJobIds('delayed', 0, 100);
-  for (const jobId of jobIds) {
-    if (jobId.includes(orderId)) {
-      const job = await orderQueue.getJob(jobId);
-      if (job) {
-        await job.remove();
-      }
+  const jobs = await orderQueue.getJobs(['delayed'], 0, 100);
+  for (const job of jobs) {
+    if (job.id?.includes(orderId)) {
+      await job.remove();
     }
   }
 

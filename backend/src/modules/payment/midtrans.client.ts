@@ -86,13 +86,13 @@ export class MidtransClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw Object.assign(new Error(`Midtrans error: ${error.status_message || 'Unknown error'}`), {
+      const error = (await response.json()) as Record<string, unknown>;
+      throw Object.assign(new Error(`Midtrans error: ${(error.status_message as string) || 'Unknown error'}`), {
         statusCode: 502,
       });
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { token: string; redirect_url: string };
     return {
       token: data.token,
       redirect_url: data.redirect_url,

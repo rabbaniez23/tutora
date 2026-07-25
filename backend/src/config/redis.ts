@@ -12,4 +12,4 @@ export const redis =
     enableReadyCheck: false,
   });
 
-if (env.NODE_ENV !== 'production') globalForRedis.redis = redis;
+if (process.env.NODE_ENV !== 'production') globalForRedis.redis = redis;

@@ -17,7 +17,7 @@ export interface DisbursementBankCode {
   BANK_BNI: 'BANK_BNI';
   BANK_MANDIRI: 'BANK_MANDIRI';
   BANK_BRI: 'BANK_BRI';
-  BANK CIMB: 'BANK_CIMB';
+  BANK_CIMB: 'BANK_CIMB';
   BANK_PERMATA: 'BANK_PERMATA';
 }
 
@@ -93,13 +93,13 @@ export class XenditClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw Object.assign(new Error(`Xendit error: ${error.message || 'Unknown error'}`), {
+      const error = (await response.json()) as Record<string, unknown>;
+      throw Object.assign(new Error(`Xendit error: ${(error.message as string) || 'Unknown error'}`), {
         statusCode: 502,
       });
     }
 
-    return response.json();
+    return response.json() as Promise<DisbursementResponse>;
   }
 
   static verifyWebhook(payload: XenditWebhookPayload): boolean {

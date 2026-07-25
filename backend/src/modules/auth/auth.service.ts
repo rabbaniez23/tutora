@@ -4,7 +4,6 @@ import { hashPassword, comparePassword } from '@/shared/utils/hash';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '@/shared/utils/jwt';
 import { generateOTP, isOTPExpired } from '@/shared/utils/otp';
 import { OTP_EXPIRY_MINUTES } from '@/config/constants';
-import { env } from '@/config/env';
 import type {
   RegisterInput,
   LoginInput,
@@ -159,7 +158,7 @@ export async function sendOTP(phone: string) {
     data: { otpCode, otpExpiresAt },
   });
 
-  if (env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development') {
     console.log(`[DEV OTP] Phone: ${phone}, Code: ${otpCode}`);
   }
 
