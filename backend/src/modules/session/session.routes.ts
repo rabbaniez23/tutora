@@ -8,6 +8,7 @@ import {
   getReportHandler,
   submitReviewHandler,
   getTeacherReviewsHandler,
+  triggerSosHandler,
 } from './session.controller';
 
 export async function sessionRoutes(app: FastifyInstance) {
@@ -130,5 +131,25 @@ export async function sessionRoutes(app: FastifyInstance) {
     },
     preHandler: [authenticate],
     handler: getTeacherReviewsHandler,
+  });
+
+  app.post('/sos', {
+    schema: {
+      tags: ['Sessions'],
+      summary: 'Trigger SOS alert during active session',
+      security: [{ bearerAuth: [] }],
+      body: {
+        type: 'object',
+        required: ['sessionId', 'latitude', 'longitude'],
+        properties: {
+          sessionId: { type: 'string', format: 'uuid' },
+          latitude: { type: 'number' },
+          longitude: { type: 'number' },
+        },
+      },
+      response: { 200: { type: 'object' } },
+    },
+    preHandler: [authenticate],
+    handler: triggerSosHandler,
   });
 }

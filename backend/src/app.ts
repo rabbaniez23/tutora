@@ -9,6 +9,10 @@ import { teacherRoutes } from '@/modules/teacher/teacher.routes';
 import { orderRoutes } from '@/modules/order/order.routes';
 import { sessionRoutes } from '@/modules/session/session.routes';
 import { walletRoutes } from '@/modules/wallet/wallet.routes';
+import { paymentRoutes } from '@/modules/payment/payment.routes';
+import { chatRoutes } from '@/modules/chat/chat.routes';
+import { familyRoutes } from '@/modules/family/family.routes';
+import { notificationRoutes } from '@/modules/notification/notification.routes';
 import { errorHandler } from '@/shared/middleware/error-handler';
 import { socketPlugin } from '@/shared/plugins/socket.plugin';
 
@@ -75,6 +79,10 @@ export async function buildApp() {
   await app.register(orderRoutes);
   await app.register(sessionRoutes);
   await app.register(walletRoutes);
+  await app.register(paymentRoutes);
+  await app.register(chatRoutes);
+  await app.register(familyRoutes);
+  await app.register(notificationRoutes);
 
   return app;
 }
