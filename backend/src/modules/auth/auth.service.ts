@@ -23,7 +23,7 @@ function createTokenPair(user: { id: string; role: string }): TokenPair {
   const payload = { id: user.id, role: user.role };
   return {
     accessToken: generateAccessToken(payload),
-    refreshToken: generateRefreshToken(payload),
+    refreshToken: generateRefreshToken({ ...payload, jti: Math.random().toString(36).substring(2) } as any),
   };
 }
 

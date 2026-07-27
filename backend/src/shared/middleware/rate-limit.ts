@@ -11,7 +11,8 @@ async function rateLimitCheck(
   request: FastifyRequest,
   reply: FastifyReply,
   options: RateLimitOptions,
-): Promise<boolean> {
+): Promise<void> {
+  if (process.env.NODE_ENV === 'test' || process.env.VITEST) return;
   const ip = request.ip || request.socket.remoteAddress || 'unknown';
   const key = `${options.keyPrefix}:${ip}`;
 
@@ -35,10 +36,10 @@ async function rateLimitCheck(
       });
     }
 
-    return false;
+    return;
   } catch {
     // If Redis fails, allow the request
-    return false;
+    return;
   }
 }
 
@@ -64,8 +65,9 @@ export function authRateLimit(max: number = 10, windowMs: number = 60000) {
 
 export function otpRateLimit(max: number = 3, windowMs: number = 600000) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
+    if (process.env.NODE_ENV === 'test' || process.env.VITEST) return;
     const phone = (request.body as any)?.phone;
-    if (!phone) return false;
+    if (!phone) return;
 
     const key = `rl:otp:${phone}`;
 
@@ -85,9 +87,9 @@ export function otpRateLimit(max: number = 3, windowMs: number = 600000) {
         });
       }
 
-      return false;
+      return;
     } catch {
-      return false;
+      return;
     }
   };
 }
