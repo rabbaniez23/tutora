@@ -1,7 +1,7 @@
 # 📚 Tutora App — Product Requirements Document (PRD)
 
 > **Versi:** 1.0.0  
-> **Tanggal:** April 2026  
+> **Tanggal:** Juli 2026  
 > **Platform:** React Native (Expo) — Android, iOS, Web & Node.js Backend  
 > **Status:** In Development (MVP Frontend & Backend Selesai)
 
@@ -111,7 +111,6 @@
 
 ## 5. Struktur Proyek
 
-```
 ```
 tutora/
 ├── backend/                      # Backend API (Node.js/Fastify)
