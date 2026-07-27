@@ -2,8 +2,8 @@
 
 > **Versi:** 1.0.0  
 > **Tanggal:** April 2026  
-> **Platform:** React Native (Expo) — Android, iOS, Web  
-> **Status:** In Development (MVP Frontend Selesai)
+> **Platform:** React Native (Expo) — Android, iOS, Web & Node.js Backend  
+> **Status:** In Development (MVP Frontend & Backend Selesai)
 
 ---
 
@@ -72,40 +72,34 @@
 
 ## 4. Arsitektur & Tech Stack
 
-```
-┌─────────────────────────────────────────────┐
-│              React Native (Expo)            │
-│                                             │
-│  ┌───────────┐  ┌───────────┐  ┌─────────┐ │
-│  │  Android  │  │   iOS     │  │   Web   │ │
-│  └───────────┘  └───────────┘  └─────────┘ │
-│                                             │
-│  ┌─────────────────────────────────────┐   │
-│  │         Expo Router (File-based)    │   │
-│  └─────────────────────────────────────┘   │
-│                                             │
-│  ┌──────────────┐   ┌────────────────────┐ │
-│  │ Zustand Store│   │ lucide-react-native│ │
-│  │ (Auth, Review│   │     (Icons)        │ │
-│  └──────────────┘   └────────────────────┘ │
-│                                             │
-│  ┌──────────────┐   ┌────────────────────┐ │
-│  │react-native  │   │  expo-linear-      │ │
-│  │    -maps     │   │    gradient        │ │
-│  └──────────────┘   └────────────────────┘ │
-└─────────────────────────────────────────────┘
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                       Sistem Tutora                         │
+│                                                             │
+│  ┌──────────────────────┐         ┌──────────────────────┐  │
+│  │    Frontend App      │         │     Backend API      │  │
+│  │ (React Native/Expo)  │ ◄─────► │  (Node.js/Fastify)   │  │
+│  └──────────────────────┘  REST   └─────────┬────────────┘  │
+│                                             │               │
+│                                     ┌───────▼────────┐      │
+│                                     │  PostgreSQL &  │      │
+│                                     │     Redis      │      │
+│                                     └────────────────┘      │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### Stack Detail
 
 | Teknologi | Versi | Kegunaan |
 |-----------|-------|----------|
-| **Expo** | ~54.0.33 | Framework utama cross-platform |
+| **Expo** | ~54.0.33 | Framework utama cross-platform (Frontend) |
 | **React Native** | 0.81.5 | Core UI framework |
-| **React** | 19.1.0 | Library UI |
-| **Expo Router** | ~6.0.23 | File-based navigation system |
-| **TypeScript** | ~5.9.2 | Type safety |
 | **Zustand** | ^5.0.12 | State management |
+| **Fastify** | ^5.10.0 | Web framework backend berkinerja tinggi |
+| **Prisma** | ^6.19.3 | ORM database backend |
+| **PostgreSQL** | v16 | Database relasional utama |
+| **Redis** | v7 | Caching & matching engine |
+| **Vitest** | ^4.1.10 | Testing framework backend |
 | **react-native-maps** | 1.20.1 | Komponen peta interaktif |
 | **lucide-react-native** | ^0.577.0 | Icon library |
 | **expo-linear-gradient** | ~15.0.8 | Efek gradien |
@@ -118,97 +112,30 @@
 ## 5. Struktur Proyek
 
 ```
-tutora-app/
-├── app/                          # Semua halaman (Expo Router)
-│   ├── _layout.tsx               # Root layout (global navigation)
-│   ├── index.tsx                 # Entry point / redirect
-│   │
-│   ├── (auth)/                   # Grup routing Autentikasi
-│   │   ├── _layout.tsx
-│   │   ├── welcome.tsx           # Halaman selamat datang
-│   │   ├── login.tsx             # Halaman login
-│   │   └── register.tsx          # Halaman registrasi
-│   │
-│   ├── (customer)/               # Grup routing Siswa
-│   │   ├── _layout.tsx
-│   │   ├── notifications.tsx     # Halaman notifikasi
-│   │   │
-│   │   ├── (tabs)/               # Bottom Tab Navigation Siswa
-│   │   │   ├── _layout.tsx       # Konfigurasi tab bar
-│   │   │   ├── index.tsx         # Beranda / Home
-│   │   │   ├── activity.tsx      # Riwayat aktivitas
-│   │   │   ├── chat.tsx          # Tab daftar chat
-│   │   │   ├── profile.tsx       # Profil siswa
-│   │   │   └── promo.tsx         # Halaman promo
-│   │   │
-│   │   ├── order/                # Alur pemesanan tutor
-│   │   │   ├── _layout.tsx
-│   │   │   ├── location.tsx      # Pilih lokasi belajar (peta)
-│   │   │   ├── subject.tsx       # Pilih mata pelajaran & voucher
-│   │   │   ├── searching.tsx     # Animasi pencarian tutor (radar)
-│   │   │   ├── tracking.tsx      # Tracking tutor menuju lokasi
-│   │   │   ├── session.tsx       # Sesi belajar aktif (timer)
-│   │   │   └── review.tsx        # Ulasan & rating pasca sesi
-│   │   │
-│   │   ├── teacher/
-│   │   │   └── [id].tsx          # Profil detail tutor (dynamic route)
-│   │   │
-│   │   ├── chat/
-│   │   │   └── room.tsx          # Ruang chat 1-on-1
-│   │   │
-│   │   ├── payment/
-│   │   │   └── index.tsx         # Halaman pembayaran
-│   │   │
-│   │   └── profile/
-│   │       ├── edit.tsx          # Edit profil siswa
-│   │       ├── help.tsx          # Bantuan & FAQ
-│   │       └── settings.tsx      # Pengaturan akun
-│   │
-│   └── (teacher)/                # Grup routing Tutor
-│       ├── _layout.tsx
-│       │
-│       ├── (tabs)/               # Bottom Tab Navigation Tutor
-│       │   ├── _layout.tsx
-│       │   ├── index.tsx         # Dashboard tutor
-│       │   ├── history.tsx       # Riwayat mengajar
-│       │   ├── earnings.tsx      # Laporan penghasilan
-│       │   └── profile.tsx       # Profil tutor
-│       │
-│       ├── job/
-│       │   ├── _layout.tsx
-│       │   ├── incoming.tsx      # Notifikasi pesanan masuk (15 detik)
-│       │   └── active.tsx        # Job yang sedang aktif
-│       │
-│       ├── payment/
-│       │   └── withdraw.tsx      # Halaman penarikan dana
-│       │
-│       └── profile/
-│           └── reviews.tsx       # Lihat semua ulasan yang diterima
+```
+tutora/
+├── backend/                      # Backend API (Node.js/Fastify)
+│   ├── src/
+│   │   ├── modules/              # Modul fitur (auth, order, teacher, dll)
+│   │   ├── config/               # Konfigurasi database & redis
+│   │   ├── shared/               # Middleware & utils
+│   │   └── __tests__/            # Unit & Integration tests
+│   ├── prisma/                   # Schema database & migrations
+│   └── package.json
 │
-├── src/
-│   ├── components/
-│   │   ├── MapComponent.tsx      # Platform resolver (mobile)
-│   │   ├── MapComponent.web.tsx  # Implementasi map untuk Web
-│   │   └── ui/
-│   │       ├── Button.tsx        # Komponen tombol reusable
-│   │       └── Input.tsx         # Komponen input reusable
-│   │
-│   ├── constants/
-│   │   └── Colors.ts             # Design token warna
-│   │
-│   └── store/
-│       ├── useAuthStore.ts       # Store autentikasi & peran pengguna
-│       └── useReviewStore.ts     # Store ulasan tutor
-│
-├── assets/                       # Gambar & asset statis
-│   ├── logowelcome.png
-│   ├── welcomelatar.jpg
-│   └── delia.webp
-│
-├── app.json                      # Konfigurasi Expo
-├── eas.json                      # Konfigurasi EAS Build
-├── package.json
-└── tsconfig.json
+├── frontend/                     # Frontend App (React Native/Expo)
+│   ├── app/                      # Semua halaman (Expo Router)
+│   │   ├── (auth)/               # Grup routing Autentikasi
+│   │   ├── (customer)/           # Grup routing Siswa
+│   │   └── (teacher)/            # Grup routing Tutor
+│   ├── src/
+│   │   ├── components/           # UI Components
+│   │   ├── constants/            # Design tokens
+│   │   └── store/                # Zustand stores
+│   ├── assets/                   # Gambar & asset statis
+│   ├── app.json                  # Konfigurasi Expo
+│   └── package.json
+└── README.md
 ```
 
 ---
@@ -560,20 +487,18 @@ Menggunakan **Expo Router v6** dengan pendekatan file-based routing.
 
 ---
 
-## 14. Fitur Belum Diimplementasi (Backlog)
+## 14. Fitur Belum Diimplementasi (Backlog Frontend)
 
-Fitur-fitur berikut sudah dirancang dalam UI/UX namun belum memiliki backend atau logika nyata:
+Sebagian besar logika *core backend* (REST API, Database, Matching Engine, Payment) **sudah selesai dibangun**. Namun, integrasi sisi *frontend* (React Native) ke API tersebut masih perlu diimplementasikan:
 
 ### 🔴 Prioritas Tinggi
 
 | Fitur | Keterangan |
 |-------|------------|
-| **Backend API** | Semua data masih hardcoded/mock. Perlu REST API atau Firebase |
-| **Real Authentication** | Login/Register masih simulasi, belum ada validasi server |
-| **Real-time Matching** | Pencarian tutor masih auto-navigate setelah 4 detik |
-| **Real Map Tracking** | Posisi tutor masih statis, belum ada geolocation dinamis |
-| **Payment Gateway** | TutorPay belum terhubung ke payment processor (Midtrans/Xendit) |
-| **Push Notifications** | Notifikasi pesanan masuk belum real (belum ada FCM/APNS) |
+| **Integrasi API Backend** | Menghubungkan semua halaman *frontend* (yang saat ini memakai mock data) ke *endpoint* REST API `Node.js` yang sudah jadi. |
+| **Integrasi Auth** | Mengganti simulasi login/register *frontend* dengan token JWT sesungguhnya dari backend. |
+| **Map Tracking & Geolocation** | Menghubungkan koordinat API `Order` dengan `expo-location` secara dinamis. |
+| **Push Notifications** | Menerima payload Webhook/FCM dari backend dan menampilkan *alert/bottom-sheet* pesanan di UI. |
 
 ### 🟡 Prioritas Menengah
 
@@ -676,4 +601,4 @@ import Button from '@/src/components/ui/Button';
 
 ---
 
-*Dokumen ini dibuat berdasarkan analisis kode sumber yang ada pada tanggal April 2026. Perbarui dokumen ini setiap kali ada penambahan fitur baru.*
+*Dokumen ini dibuat berdasarkan analisis kode sumber yang ada pada tanggal Juli 2026. Perbarui dokumen ini setiap kali ada penambahan fitur baru.*

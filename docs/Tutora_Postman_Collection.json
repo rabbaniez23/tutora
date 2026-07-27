@@ -1,0 +1,1242 @@
+{
+  "info": {
+    "name": "Tutora API",
+    "description": "Collection lengkap API Backend Tutora dengan endpoint pengujian terbaru",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "0. Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Register Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Student\",\n  \"email\": \"teststudent@gmail.com\",\n  \"phone\": \"081299990001\",\n  \"password\": \"Password123!\",\n  \"role\": \"STUDENT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","register"]
+            }
+          }
+        },
+        {
+          "name": "Register Parent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Parent\",\n  \"email\": \"testparent@gmail.com\",\n  \"phone\": \"081299990002\",\n  \"password\": \"Password123!\",\n  \"role\": \"PARENT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"delia@gmail.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","login"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"YOUR_REFRESH_TOKEN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","refresh"]
+            }
+          }
+        },
+        {
+          "name": "Teacher Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Guru Baru Test\",\n  \"email\": \"gurubaru@gmail.com\",\n  \"phone\": \"081399990001\",\n  \"password\": \"Password123!\",\n  \"university\": \"Universitas Test\",\n  \"major\": \"Pendidikan Matematika\",\n  \"yearEnrolled\": 2021,\n  \"gpa\": 3.75,\n  \"subjects\": [\"Matematika\", \"Fisika\"],\n  \"bio\": \"Guru baru untuk testing\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/teacher/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","teacher","register"]
+            }
+          }
+        },
+        {
+          "name": "Teacher KYC",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nik\": \"3201010199990001\",\n  \"ktpPhotoUrl\": \"https://storage.tutora.id/ktp/test.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/teacher/kyc",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","teacher","kyc"]
+            }
+          }
+        },
+        {
+          "name": "Teacher Documents",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentUrls\": [\n    \"https://storage.tutora.id/docs/ijazah.jpg\",\n    \"https://storage.tutora.id/docs/transkrip.jpg\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/teacher/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","teacher","documents"]
+            }
+          }
+        },
+        {
+          "name": "Teacher Video",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"videoUrl\": \"https://storage.tutora.id/video/intro.mp4\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/teacher/video",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","teacher","video"]
+            }
+          }
+        },
+        {
+          "name": "OTP Send",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"081234567001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/otp/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","otp","send"]
+            }
+          }
+        },
+        {
+          "name": "OTP Verify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"081234567001\",\n  \"code\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/otp/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","otp","verify"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"YOUR_REFRESH_TOKEN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. User & Teacher",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users","me"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Delia Updated\",\n  \"avatarUrl\": \"https://storage.tutora.id/avatar/delia-new.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users","me"]
+            }
+          }
+        },
+        {
+          "name": "List Teachers (Distance)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teachers?lat=-6.2088&lng=106.8456&radius=10000&sort=distance",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers"],
+              "query": [
+                { "key": "lat", "value": "-6.2088" },
+                { "key": "lng", "value": "106.8456" },
+                { "key": "radius", "value": "10000" },
+                { "key": "sort", "value": "distance" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Teachers (Filter Mapel)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teachers?subject=Matematika&level=SMA&sort=rating",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers"],
+              "query": [
+                { "key": "subject", "value": "Matematika" },
+                { "key": "level", "value": "SMA" },
+                { "key": "sort", "value": "rating" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Teacher Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teachers/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", ":id"],
+              "variable": [
+                { "key": "id", "value": "TEACHER_USER_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Toggle Online Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isOnline\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teachers/me/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers","me","status"]
+            }
+          }
+        },
+        {
+          "name": "Update Teacher Location",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": -6.2100,\n  \"longitude\": 106.8500\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teachers/me/location",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers","me","location"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Order",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Matematika\",\n  \"level\": \"SMA\",\n  \"durationHours\": 1.5,\n  \"sessionsTotal\": 1,\n  \"latitude\": -6.2088,\n  \"longitude\": 106.8456,\n  \"addressText\": \"Jl. Sudirman No. 1, Jakarta\",\n  \"scheduleType\": \"NOW\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders"]
+            }
+          }
+        },
+        {
+          "name": "Get Active Order",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/active",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders","active"]
+            }
+          }
+        },
+        {
+          "name": "Get Order Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", ":id"],
+              "variable": [
+                { "key": "id", "value": "ORDER_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Accept Order (Teacher)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/:id/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", ":id", "accept"],
+              "variable": [
+                { "key": "id", "value": "ORDER_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reject Order (Teacher)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/:id/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", ":id", "reject"],
+              "variable": [
+                { "key": "id", "value": "ORDER_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Berubah pikiran\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/:id/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", ":id", "cancel"],
+              "variable": [
+                { "key": "id", "value": "ORDER_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Order History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/history?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders","history"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Session & Review",
+      "item": [
+        {
+          "name": "Start Session",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:id/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", ":id", "start"],
+              "variable": [
+                { "key": "id", "value": "ORDER_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "End Session",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:id/end",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", ":id", "end"],
+              "variable": [
+                { "key": "id", "value": "SESSION_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit Learning Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"Siswa sudah memahami konsep turunan dan integral dasar\",\n  \"characters\": [\"Rajin\", \"Mudah memahami\"],\n  \"photoUrl\": \"https://storage.tutora.id/reports/session1.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:id/report",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", ":id", "report"],
+              "variable": [
+                { "key": "id", "value": "SESSION_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Learning Report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:id/report",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", ":id", "report"],
+              "variable": [
+                { "key": "id", "value": "SESSION_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"content\": \"Pak Budi mengajar dengan sangat jelas dan sabar!\",\n  \"tags\": [\"Sabar\", \"Jelas\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:id/review",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", ":id", "review"],
+              "variable": [
+                { "key": "id", "value": "SESSION_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Teacher Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teachers/:id/reviews?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", ":id", "reviews"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ],
+              "variable": [
+                { "key": "id", "value": "TEACHER_USER_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Trigger SOS Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"YOUR_SESSION_ID\",\n  \"latitude\": -6.2088,\n  \"longitude\": 106.8456\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sos",
+              "host": ["{{baseUrl}}"],
+              "path": ["sos"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Wallet",
+      "item": [
+        {
+          "name": "Get Wallet Balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallet/balance",
+              "host": ["{{baseUrl}}"],
+              "path": ["wallet","balance"]
+            }
+          }
+        },
+        {
+          "name": "Get Transaction History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallet/transactions?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["wallet","transactions"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Payments",
+      "item": [
+        {
+          "name": "Create Topup (Midtrans)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 100000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments/topup",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments","topup"]
+            }
+          }
+        },
+        {
+          "name": "Request Withdrawal (Xendit)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50000,\n  \"bankCode\": \"BANK_BCA\",\n  \"accountNumber\": \"1234567890\",\n  \"accountName\": \"Budi Santoso\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments/withdraw",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments","withdraw"]
+            }
+          }
+        },
+        {
+          "name": "Midtrans Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"test-topup-order-123\",\n  \"transaction_status\": \"settlement\",\n  \"gross_amount\": \"100000.00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhooks/midtrans",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhooks","midtrans"]
+            }
+          }
+        },
+        {
+          "name": "Xendit Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"disb-test-123\",\n  \"status\": \"COMPLETED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhooks/xendit",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhooks","xendit"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Chat",
+      "item": [
+        {
+          "name": "Get Chat Rooms",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/chats",
+              "host": ["{{baseUrl}}"],
+              "path": ["chats"]
+            }
+          }
+        },
+        {
+          "name": "Get Messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/chats/:roomId/messages?limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["chats", ":roomId", "messages"],
+              "query": [
+                { "key": "limit", "value": "50" }
+              ],
+              "variable": [
+                { "key": "roomId", "value": "ROOM_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Halo Pak Budi, saya mau tanya soal jadwal les\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chats/:roomId/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["chats", ":roomId", "messages"],
+              "variable": [
+                { "key": "roomId", "value": "ROOM_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Messages as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/chats/:roomId/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["chats", ":roomId", "read"],
+              "variable": [
+                { "key": "roomId", "value": "ROOM_ID" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Family (Parent)",
+      "item": [
+        {
+          "name": "Add Child (Create New Account)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"childName\": \"Kevin Saputra\",\n  \"childEmail\": \"kevin.new@gmail.com\",\n  \"childGrade\": \"SD 6\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/parent/children",
+              "host": ["{{baseUrl}}"],
+              "path": ["parent","children"]
+            }
+          }
+        },
+        {
+          "name": "Add Child (Link Existing Student)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"childUserId\": \"YOUR_EXISTING_STUDENT_USER_ID\",\n  \"childGrade\": \"SD 6\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/parent/children",
+              "host": ["{{baseUrl}}"],
+              "path": ["parent","children"]
+            }
+          }
+        },
+        {
+          "name": "Get All Children",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/parent/children",
+              "host": ["{{baseUrl}}"],
+              "path": ["parent","children"]
+            }
+          }
+        },
+        {
+          "name": "Get Child Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/parent/children/:childId",
+              "host": ["{{baseUrl}}"],
+              "path": ["parent", "children", ":childId"],
+              "variable": [
+                { "key": "childId", "value": "CHILD_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Topup Child Balance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 100000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/parent/children/:childId/topup",
+              "host": ["{{baseUrl}}"],
+              "path": ["parent", "children", ":childId", "topup"],
+              "variable": [
+                { "key": "childId", "value": "CHILD_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Child Order History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/parent/children/:childId/orders?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["parent", "children", ":childId", "orders"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ],
+              "variable": [
+                { "key": "childId", "value": "CHILD_ID" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Notifications",
+      "item": [
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/:id/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", ":id", "read"],
+              "variable": [
+                { "key": "id", "value": "NOTIFICATION_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Register FCM Device Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"fake-fcm-token-for-testing-123\",\n  \"deviceInfo\": \"Postman Test Device\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications/register-device",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications","register-device"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Admin",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin","dashboard"]
+            }
+          }
+        },
+        {
+          "name": "List Pending Teachers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/teachers/pending?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin","teachers","pending"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Teacher Documents",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/teachers/:id/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "teachers", ":id", "documents"],
+              "variable": [
+                { "key": "id", "value": "NEW_TEACHER_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Approve Teacher",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/teachers/:id/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "teachers", ":id", "approve"],
+              "variable": [
+                { "key": "id", "value": "NEW_TEACHER_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reject Teacher",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Dokumen KTP kurang jelas.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/teachers/:id/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "teachers", ":id", "reject"],
+              "variable": [
+                { "key": "id", "value": "NEW_TEACHER_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/orders?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin","orders"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/transactions?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin","transactions"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Promotion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Promo Testing\",\n  \"description\": \"Diskon test 10%\",\n  \"discountType\": \"PERCENTAGE\",\n  \"discountValue\": 10,\n  \"minOrderAmount\": 50000,\n  \"maxDiscount\": 20000,\n  \"startDate\": \"2026-07-01T00:00:00.000Z\",\n  \"endDate\": \"2026-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/promotions",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin","promotions"]
+            }
+          }
+        },
+        {
+          "name": "Create Voucher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"TESTCODE10\",\n  \"promotionId\": \"PROMO_ID\",\n  \"maxUsage\": 100,\n  \"expiresAt\": \"2026-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/vouchers",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin","vouchers"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Public Promo & Voucher",
+      "item": [
+        {
+          "name": "Get Active Promotions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/promotions",
+              "host": ["{{baseUrl}}"],
+              "path": ["promotions"]
+            }
+          }
+        },
+        {
+          "name": "Validate Voucher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"WELCOME25K\",\n  \"orderAmount\": 100000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vouchers/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["vouchers","validate"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "token",
+      "value": "YOUR_ACCESS_TOKEN"
+    }
+  ]
+}
