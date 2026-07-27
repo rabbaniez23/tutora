@@ -3,6 +3,7 @@ import { prisma } from '@/config/database';
 import { hashPassword, comparePassword } from '@/shared/utils/hash';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '@/shared/utils/jwt';
 import { generateOTP, isOTPExpired } from '@/shared/utils/otp';
+import { sendWhatsAppMessage } from '@/shared/utils/whatsapp';
 import { OTP_EXPIRY_MINUTES } from '@/config/constants';
 import type {
   RegisterInput,
@@ -83,7 +84,7 @@ export async function login(email: string, password: string) {
     data: {
       userId: user.id,
       token: tokens.refreshToken,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 3650 * 24 * 60 * 60 * 1000),
     },
   });
 
@@ -132,7 +133,7 @@ export async function refreshToken(token: string) {
     data: {
       userId: user.id,
       token: newTokens.refreshToken,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 3650 * 24 * 60 * 60 * 1000),
     },
   });
 
@@ -140,7 +141,10 @@ export async function refreshToken(token: string) {
 }
 
 export async function logout(refreshToken: string) {
-  await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
+  const result = await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
+  if (result.count === 0) {
+    throw Object.assign(new Error('Invalid refresh token or session already logged out'), { statusCode: 400 });
+  }
 }
 
 export async function sendOTP(phone: string) {
@@ -162,8 +166,8 @@ export async function sendOTP(phone: string) {
     console.log(`[DEV OTP] Phone: ${phone}, Code: ${otpCode}`);
   }
 
-  // TODO: Integrate with Fonnte WhatsApp API in production
-  // await sendWhatsAppMessage(phone, `Kode verifikasi Tutora Anda: ${otpCode}`);
+  // Send WhatsApp message if FONNTE_TOKEN is set
+  await sendWhatsAppMessage(phone, `Kode verifikasi Tutora Anda: ${otpCode}. Kode ini berlaku selama ${OTP_EXPIRY_MINUTES} menit.`);
 
   return { message: 'OTP sent successfully' };
 }

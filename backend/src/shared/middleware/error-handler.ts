@@ -64,6 +64,7 @@ export async function errorHandler(
   }
 
   // Unknown errors
+  console.error('[UNHANDLED ERROR]', error);
   return reply.status(500).send({
     statusCode: 500,
     error: 'Internal Server Error',

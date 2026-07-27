@@ -26,42 +26,49 @@ export async function listTeachers(filters: ListTeachersInput) {
   let orderBy: Record<string, string>;
 
   if (lat && lng && sort === 'distance') {
-    // PostGIS raw query for distance sorting
-    const teachers = await prisma.$queryRaw<
-      Array<{
-        id: string;
-        name: string;
-        email: string;
-        phone: string;
-        avatar_url: string | null;
-        subjects: string[];
-        bio: string | null;
-        profile_photo: string | null;
-        average_rating: number;
-        total_reviews: number;
-        total_sessions: number;
-        latitude: number;
-        longitude: number;
-        distance_m: number;
-      }>
-    >`
+    // Haversine formula in pure SQL — no PostGIS needed
+    const radiusM = radius ?? 5000;
+
+    type RawTeacher = {
+      id: string;
+      name: string;
+      email: string;
+      phone: string;
+      avatarUrl: string | null;
+      subjects: string[];
+      bio: string | null;
+      profile_photo: string | null;
+      average_rating: number;
+      total_reviews: number;
+      total_sessions: number;
+      latitude: number;
+      longitude: number;
+      distance_m: number;
+    };
+
+    const teachers = await prisma.$queryRaw<RawTeacher[]>`
       SELECT
         u.id,
         u.name,
         u.email,
         u.phone,
-        u.avatar_url,
+        u."avatarUrl",
         tp.subjects,
         tp.bio,
-        tp.profile_photo as profile_photo,
+        tp.profile_photo,
         tp.average_rating,
         tp.total_reviews,
         tp.total_sessions,
         tp.latitude,
         tp.longitude,
-        ST_Distance(
-          ST_SetSRID(ST_MakePoint(tp.longitude, tp.latitude), 4326)::geography,
-          ST_SetSRID(ST_MakePoint(${lng}::float, ${lat}::float), 4326)::geography
+        (
+          6371000 * acos(
+            GREATEST(-1, LEAST(1,
+              cos(radians(${lat}::float)) * cos(radians(tp.latitude)) *
+              cos(radians(tp.longitude) - radians(${lng}::float)) +
+              sin(radians(${lat}::float)) * sin(radians(tp.latitude))
+            ))
+          )
         ) AS distance_m
       FROM users u
       INNER JOIN teacher_profiles tp ON tp.id = u.id
@@ -70,13 +77,17 @@ export async function listTeachers(filters: ListTeachersInput) {
         AND tp.onboard_status = 'APPROVED'
         AND tp.kyc_status = 'VERIFIED'
         AND ta.is_online = true
-        ${subject ? prisma.$queryRaw`AND ${subject} = ANY(tp.subjects)` : prisma.$queryRaw``}
-        ${minRating ? prisma.$queryRaw`AND tp.average_rating >= ${minRating}` : prisma.$queryRaw``}
-        AND ST_DWithin(
-          ST_SetSRID(ST_MakePoint(tp.longitude, tp.latitude), 4326)::geography,
-          ST_SetSRID(ST_MakePoint(${lng}::float, ${lat}::float), 4326)::geography,
-          ${radius}
-        )
+        AND tp.latitude IS NOT NULL
+        AND tp.longitude IS NOT NULL
+        AND (
+          6371000 * acos(
+            GREATEST(-1, LEAST(1,
+              cos(radians(${lat}::float)) * cos(radians(tp.latitude)) *
+              cos(radians(tp.longitude) - radians(${lng}::float)) +
+              sin(radians(${lat}::float)) * sin(radians(tp.latitude))
+            ))
+          )
+        ) <= ${radiusM}::float
       ORDER BY distance_m ASC
       LIMIT ${limit} OFFSET ${offset}
     `;
@@ -89,7 +100,7 @@ export async function listTeachers(filters: ListTeachersInput) {
         name: t.name,
         email: t.email,
         phone: t.phone,
-        avatarUrl: t.avatar_url,
+        avatarUrl: t.avatarUrl,
         subjects: t.subjects,
         bio: t.bio,
         profilePhoto: t.profile_photo,
@@ -108,6 +119,8 @@ export async function listTeachers(filters: ListTeachersInput) {
       },
     };
   }
+
+
 
   // Fallback: no geo sorting, use Prisma ORM
   orderBy = sort === 'rating'

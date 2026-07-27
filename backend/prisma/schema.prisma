@@ -113,7 +113,8 @@ model User {
   orderedOrders         Order[]              @relation("OrderedBy")
   studentOrders         Order[]              @relation("StudentOrders")
   teacherOrders         Order[]              @relation("TeacherOrders")
-  parentChildren        ParentChild[]
+  parentChildren        ParentChild[]       @relation("ParentChildParent")
+  parentChildrenAsChild ParentChild[]       @relation("ParentChildChild")
   refreshTokens         RefreshToken[]
   reviewsGiven          Review[]             @relation("Reviewer")
   transactions          Transaction[]
@@ -200,16 +201,18 @@ model Wallet {
 }
 
 model ParentChild {
-  id         String  @id @default(uuid()) @db.Uuid
-  parentId   String  @map("parent_id") @db.Uuid
-  childName  String  @map("child_name")
-  childGrade String  @map("child_grade")
+  id          String @id @default(uuid()) @db.Uuid
+  parentId    String @map("parent_id") @db.Uuid
+  childUserId String @unique @map("child_user_id") @db.Uuid
+  childGrade  String @map("child_grade")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  parent User @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parent    User @relation("ParentChildParent", fields: [parentId], references: [id], onDelete: Cascade)
+  childUser User @relation("ParentChildChild", fields: [childUserId], references: [id])
 
   @@index([parentId])
+  @@index([childUserId])
   @@map("parent_children")
 }
 
@@ -254,7 +257,7 @@ model Order {
 model Session {
   id             String   @id @default(uuid()) @db.Uuid
   orderId        String   @map("order_id") @db.Uuid
-  startedAt      DateTime @map("started_at")
+  startedAt      DateTime? @map("started_at")
   endedAt        DateTime? @map("ended_at")
   geoConfirmed   Boolean  @default(false) @map("geo_confirmed")
   geoDistanceM    Float?   @map("geo_distance_m")

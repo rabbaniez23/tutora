@@ -33,7 +33,7 @@ export async function teacherRoutes(app: FastifyInstance) {
           limit: { type: 'integer', default: 20, maximum: 50 },
         },
       },
-      response: { 200: { type: 'object' } },
+      response: { 200: { type: 'object', additionalProperties: true } },
     },
     preHandler: [
       authenticate,
@@ -54,7 +54,7 @@ export async function teacherRoutes(app: FastifyInstance) {
           id: { type: 'string', format: 'uuid' },
         },
       },
-      response: { 200: { type: 'object' } },
+      response: { 200: { type: 'object', additionalProperties: true } },
     },
     preHandler: [authenticate],
     handler: getTeacherDetailHandler,
@@ -72,7 +72,7 @@ export async function teacherRoutes(app: FastifyInstance) {
           isOnline: { type: 'boolean' },
         },
       },
-      response: { 200: { type: 'object' } },
+      response: { 200: { type: 'object', additionalProperties: true } },
     },
     preHandler: [
       authenticate,
@@ -95,7 +95,7 @@ export async function teacherRoutes(app: FastifyInstance) {
           longitude: { type: 'number', minimum: -180, maximum: 180 },
         },
       },
-      response: { 200: { type: 'object' } },
+      response: { 200: { type: 'object', additionalProperties: true } },
     },
     preHandler: [
       authenticate,

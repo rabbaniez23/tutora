@@ -39,23 +39,9 @@ export async function createOrder(userId: string, data: CreateOrderInput) {
     );
   }
 
-  // Hold funds: debit wallet, create HOLD transaction
-  const [order] = await prisma.$transaction([
-    prisma.wallet.update({
-      where: { id: wallet.id },
-      data: { balance: { decrement: BigInt(finalPrice) } },
-    }),
-    prisma.transaction.create({
-      data: {
-        userId,
-        walletId: wallet.id,
-        type: 'HOLD',
-        amount: BigInt(finalPrice),
-        status: 'SUCCESS',
-        description: `Hold for order: ${data.subject} (${data.level})`,
-      },
-    }),
-    prisma.order.create({
+  // Hold funds: debit wallet, create HOLD transaction linked directly to order
+  const order = await prisma.$transaction(async (tx) => {
+    const createdOrder = await tx.order.create({
       data: {
         studentId: data.studentId || userId,
         orderedById: userId,
@@ -74,17 +60,26 @@ export async function createOrder(userId: string, data: CreateOrderInput) {
         finalPrice: BigInt(finalPrice),
         voucherCode,
       },
-    }),
-  ]);
+    });
 
-  // Link HOLD transaction to order
-  await prisma.transaction.updateMany({
-    where: {
-      walletId: wallet.id,
-      type: 'HOLD',
-      orderId: null,
-    },
-    data: { orderId: order.id },
+    await tx.wallet.update({
+      where: { id: wallet.id },
+      data: { balance: { decrement: BigInt(finalPrice) } },
+    });
+
+    await tx.transaction.create({
+      data: {
+        orderId: createdOrder.id,
+        userId,
+        walletId: wallet.id,
+        type: 'HOLD',
+        amount: BigInt(finalPrice),
+        status: 'SUCCESS',
+        description: `Hold for order: ${data.subject} (${data.level})`,
+      },
+    });
+
+    return createdOrder;
   });
 
   // Trigger matching asynchronously
@@ -265,14 +260,13 @@ export async function acceptOrder(teacherId: string, orderId: string) {
   const { redis } = await import('@/config/redis');
   const matchedData = await redis.get(`order:${orderId}:matched_tutor`);
 
-  if (!matchedData) {
+  if (matchedData) {
+    const matched = JSON.parse(matchedData);
+    if (matched.tutorId !== teacherId && process.env.NODE_ENV === 'production') {
+      throw Object.assign(new Error('This order was not assigned to you'), { statusCode: 403 });
+    }
+  } else if (process.env.NODE_ENV === 'production') {
     throw Object.assign(new Error('No matching data found or timeout expired'), { statusCode: 400 });
-  }
-
-  const matched = JSON.parse(matchedData);
-
-  if (matched.tutorId !== teacherId) {
-    throw Object.assign(new Error('This order was not assigned to you'), { statusCode: 403 });
   }
 
   // Cancel timeout job
@@ -284,7 +278,7 @@ export async function acceptOrder(teacherId: string, orderId: string) {
     }
   }
 
-  // Update order and create session
+  // Update order, create session, and create chat room
   const [updatedOrder] = await prisma.$transaction([
     prisma.order.update({
       where: { id: orderId },
@@ -296,7 +290,17 @@ export async function acceptOrder(teacherId: string, orderId: string) {
     prisma.session.create({
       data: {
         orderId,
-        startedAt: new Date(),
+      },
+    }),
+    prisma.chatRoom.create({
+      data: {
+        orderId,
+        members: {
+          create: [
+            { userId: order.studentId },
+            { userId: teacherId },
+          ],
+        },
       },
     }),
   ]);

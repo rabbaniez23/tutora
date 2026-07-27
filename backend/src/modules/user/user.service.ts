@@ -40,8 +40,10 @@ export async function getProfile(userId: string) {
       parentChildren: {
         select: {
           id: true,
-          childName: true,
           childGrade: true,
+          childUser: {
+            select: { id: true, name: true, email: true },
+          },
         },
       },
     },

@@ -12,7 +12,7 @@ export async function userRoutes(app: FastifyInstance) {
       tags: ['Users'],
       summary: 'Get current user profile',
       security: [{ bearerAuth: [] }],
-      response: { 200: { type: 'object' } },
+      response: { 200: { type: 'object', additionalProperties: true } },
     },
     preHandler: [authenticate],
     handler: getProfileHandler,
@@ -30,7 +30,7 @@ export async function userRoutes(app: FastifyInstance) {
           avatarUrl: { type: 'string' },
         },
       },
-      response: { 200: { type: 'object' } },
+      response: { 200: { type: 'object', additionalProperties: true } },
     },
     preHandler: [
       authenticate,

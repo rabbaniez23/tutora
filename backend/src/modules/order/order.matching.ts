@@ -2,6 +2,7 @@ import { prisma } from '@/config/database';
 import { redis } from '@/config/redis';
 import { ORDER_TIMEOUT_SECONDS } from '@/config/constants';
 import { orderQueue } from '@/jobs/queue';
+import { Prisma } from '@prisma/client';
 
 export async function findAndNotifyTutor(orderId: string) {
   const order = await prisma.order.findUnique({
@@ -17,7 +18,7 @@ export async function findAndNotifyTutor(orderId: string) {
     Array<{
       id: string;
       name: string;
-      avatar_url: string | null;
+      avatarUrl: string | null;
       subjects: string[];
       average_rating: number;
       total_sessions: number;
@@ -29,15 +30,20 @@ export async function findAndNotifyTutor(orderId: string) {
     SELECT
       u.id,
       u.name,
-      u.avatar_url,
+      u."avatarUrl",
       tp.subjects,
       tp.average_rating,
       tp.total_sessions,
       tp.latitude,
       tp.longitude,
-      ST_Distance(
-        ST_SetSRID(ST_MakePoint(tp.longitude, tp.latitude), 4326)::geography,
-        ST_SetSRID(ST_MakePoint(${order.longitude}::float, ${order.latitude}::float), 4326)::geography
+      (
+        6371000 * acos(
+          GREATEST(-1, LEAST(1,
+            cos(radians(${order.latitude}::float)) * cos(radians(tp.latitude)) *
+            cos(radians(tp.longitude) - radians(${order.longitude}::float)) +
+            sin(radians(${order.latitude}::float)) * sin(radians(tp.latitude))
+          ))
+        )
       ) AS distance_m
     FROM users u
     INNER JOIN teacher_profiles tp ON tp.id = u.id
@@ -47,11 +53,17 @@ export async function findAndNotifyTutor(orderId: string) {
       AND tp.kyc_status = 'VERIFIED'
       AND ta.is_online = true
       AND ${order.subject} = ANY(tp.subjects)
-      AND ST_DWithin(
-        ST_SetSRID(ST_MakePoint(tp.longitude, tp.latitude), 4326)::geography,
-        ST_SetSRID(ST_MakePoint(${order.longitude}::float, ${order.latitude}::float), 4326)::geography,
-        ${5000}
-      )
+      AND tp.latitude IS NOT NULL
+      AND tp.longitude IS NOT NULL
+      AND (
+        6371000 * acos(
+          GREATEST(-1, LEAST(1,
+            cos(radians(${order.latitude}::float)) * cos(radians(tp.latitude)) *
+            cos(radians(tp.longitude) - radians(${order.longitude}::float)) +
+            sin(radians(${order.latitude}::float)) * sin(radians(tp.latitude))
+          ))
+        )
+      ) <= 5000::float
     ORDER BY distance_m ASC, tp.average_rating DESC
     LIMIT 5
   `;
@@ -141,8 +153,8 @@ export async function notifyNextTutor(orderId: string, excludeTutorIds: string[]
   }
 
   const excludeCondition = excludeTutorIds.length > 0
-    ? `AND u.id NOT IN (${excludeTutorIds.map((id) => `'${id}'`).join(',')})`
-    : '';
+    ? Prisma.sql`AND u.id::text NOT IN (${Prisma.join(excludeTutorIds)})`
+    : Prisma.empty;
 
   const availableTutors = await prisma.$queryRaw<
     Array<{
@@ -154,9 +166,14 @@ export async function notifyNextTutor(orderId: string, excludeTutorIds: string[]
     SELECT
       u.id,
       u.name,
-      ST_Distance(
-        ST_SetSRID(ST_MakePoint(tp.longitude, tp.latitude), 4326)::geography,
-        ST_SetSRID(ST_MakePoint(${order.longitude}::float, ${order.latitude}::float), 4326)::geography
+      (
+        6371000 * acos(
+          GREATEST(-1, LEAST(1,
+            cos(radians(${order.latitude}::float)) * cos(radians(tp.latitude)) *
+            cos(radians(tp.longitude) - radians(${order.longitude}::float)) +
+            sin(radians(${order.latitude}::float)) * sin(radians(tp.latitude))
+          ))
+        )
       ) AS distance_m
     FROM users u
     INNER JOIN teacher_profiles tp ON tp.id = u.id
@@ -166,12 +183,18 @@ export async function notifyNextTutor(orderId: string, excludeTutorIds: string[]
       AND tp.kyc_status = 'VERIFIED'
       AND ta.is_online = true
       AND ${order.subject} = ANY(tp.subjects)
+      AND tp.latitude IS NOT NULL
+      AND tp.longitude IS NOT NULL
       ${excludeCondition}
-      AND ST_DWithin(
-        ST_SetSRID(ST_MakePoint(tp.longitude, tp.latitude), 4326)::geography,
-        ST_SetSRID(ST_MakePoint(${order.longitude}::float, ${order.latitude}::float), 4326)::geography,
-        ${5000}
-      )
+      AND (
+        6371000 * acos(
+          GREATEST(-1, LEAST(1,
+            cos(radians(${order.latitude}::float)) * cos(radians(tp.latitude)) *
+            cos(radians(tp.longitude) - radians(${order.longitude}::float)) +
+            sin(radians(${order.latitude}::float)) * sin(radians(tp.latitude))
+          ))
+        )
+      ) <= 5000::float
     ORDER BY distance_m ASC, tp.average_rating DESC
     LIMIT 1
   `;

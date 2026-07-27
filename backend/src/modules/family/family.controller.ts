@@ -2,7 +2,15 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import * as familyService from './family.service';
 
 export async function addChildHandler(
-  request: FastifyRequest<{ Body: { childName: string; childGrade: string } }>,
+  request: FastifyRequest<{
+    Body: {
+      childUserId?: string;
+      childName?: string;
+      childEmail?: string;
+      childPhone?: string;
+      childGrade: string;
+    };
+  }>,
   reply: FastifyReply,
 ) {
   const child = await familyService.addChild(request.user.id, request.body);

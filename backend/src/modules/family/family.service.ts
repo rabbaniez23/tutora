@@ -1,59 +1,178 @@
 import { prisma } from '@/config/database';
+import bcrypt from 'bcryptjs';
 
-export async function addChild(parentId: string, data: { childName: string; childGrade: string }) {
-  const child = await prisma.parentChild.create({
+export async function addChild(
+  parentId: string,
+  data: {
+    childUserId?: string;
+    childName?: string;
+    childEmail?: string;
+    childPhone?: string;
+    childGrade: string;
+  },
+) {
+  let childUser;
+
+  // Case 1: Link by childUserId
+  if (data.childUserId) {
+    childUser = await prisma.user.findUnique({
+      where: { id: data.childUserId },
+    });
+
+    if (!childUser) {
+      throw Object.assign(new Error('Student user not found'), { statusCode: 404 });
+    }
+
+    if (childUser.role !== 'STUDENT') {
+      throw Object.assign(new Error('User is not a student'), { statusCode: 400 });
+    }
+  }
+  // Case 2: Link or create by childEmail
+  else if (data.childEmail) {
+    const existing = await prisma.user.findFirst({
+      where: { email: data.childEmail },
+    });
+
+    if (existing) {
+      if (existing.role !== 'STUDENT') {
+        throw Object.assign(new Error('User with this email is not a student'), { statusCode: 400 });
+      }
+      childUser = existing;
+    } else {
+      if (!data.childName) {
+        throw Object.assign(
+          new Error('childName is required to create a new child account'),
+          { statusCode: 400 },
+        );
+      }
+
+      const phone = data.childPhone || `0800${Date.now()}${Math.floor(Math.random() * 1000)}`;
+      const hash = await bcrypt.hash('Password123!', 10);
+      childUser = await prisma.user.create({
+        data: {
+          role: 'STUDENT',
+          name: data.childName,
+          email: data.childEmail,
+          phone,
+          passwordHash: hash,
+          phoneVerified: false,
+          wallet: { create: { balance: 0 } },
+        },
+      });
+    }
+  } else {
+    throw Object.assign(
+      new Error('Either childUserId or childEmail must be provided'),
+      { statusCode: 400 },
+    );
+  }
+
+  // Check if already linked
+  const alreadyLinked = await prisma.parentChild.findUnique({
+    where: { childUserId: childUser.id },
+  });
+
+  if (alreadyLinked) {
+    if (alreadyLinked.parentId === parentId) {
+      throw Object.assign(new Error('This child is already linked to your account'), { statusCode: 409 });
+    } else {
+      throw Object.assign(new Error('This child is already linked to another parent account'), { statusCode: 409 });
+    }
+  }
+
+  const parentChild = await prisma.parentChild.create({
     data: {
       parentId,
-      childName: data.childName,
+      childUserId: childUser.id,
       childGrade: data.childGrade,
     },
   });
 
-  return child;
+  return {
+    id: parentChild.id,
+    childUserId: childUser.id,
+    childName: childUser.name,
+    childEmail: childUser.email,
+    childPhone: childUser.phone,
+    childGrade: parentChild.childGrade,
+    createdAt: parentChild.createdAt,
+  };
 }
 
 export async function getChildren(parentId: string) {
   const children = await prisma.parentChild.findMany({
     where: { parentId },
     include: {
-      parent: {
-        select: { id: true },
+      childUser: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          avatarUrl: true,
+          wallet: { select: { balance: true } },
+        },
       },
     },
     orderBy: { createdAt: 'desc' },
   });
 
-  // Get order counts and wallet balances for each child
-  const childrenWithDetails = await Promise.all(
+  const childrenWithOrders = await Promise.all(
     children.map(async (child) => {
-      // Children don't have wallets in current schema, but they share parent's wallet
       const orderCount = await prisma.order.count({
-        where: { studentId: parentId, subject: { not: undefined } },
+        where: { studentId: child.childUserId },
       });
 
       return {
         id: child.id,
-        childName: child.childName,
+        childUserId: child.childUserId,
+        childName: child.childUser.name,
+        childEmail: child.childUser.email,
+        childPhone: child.childUser.phone,
         childGrade: child.childGrade,
+        avatarUrl: child.childUser.avatarUrl,
+        walletBalance: child.childUser.wallet?.balance ?? BigInt(0),
         totalOrders: orderCount,
         createdAt: child.createdAt,
       };
     }),
   );
 
-  return childrenWithDetails;
+  return childrenWithOrders;
 }
 
 export async function getChildDetail(parentId: string, childId: string) {
   const child = await prisma.parentChild.findFirst({
     where: { id: childId, parentId },
+    include: {
+      childUser: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          avatarUrl: true,
+          wallet: { select: { balance: true } },
+        },
+      },
+    },
   });
 
   if (!child) {
     throw Object.assign(new Error('Child not found'), { statusCode: 404 });
   }
 
-  return child;
+  return {
+    id: child.id,
+    childUserId: child.childUserId,
+    childName: child.childUser.name,
+    childEmail: child.childUser.email,
+    childPhone: child.childUser.phone,
+    childGrade: child.childGrade,
+    avatarUrl: child.childUser.avatarUrl,
+    walletBalance: child.childUser.wallet?.balance ?? BigInt(0),
+    createdAt: child.createdAt,
+  };
 }
 
 export async function topupChild(parentId: string, childId: string, amount: number) {
@@ -79,16 +198,14 @@ export async function topupChild(parentId: string, childId: string, amount: numb
     throw Object.assign(new Error('Insufficient balance'), { statusCode: 400 });
   }
 
-  // Create or find child's wallet
-  let childWallet = await prisma.wallet.findUnique({ where: { userId: childId } });
+  const childWallet = await prisma.wallet.findUnique({ where: { userId: child.childUserId } });
 
   if (!childWallet) {
-    childWallet = await prisma.wallet.create({
-      data: { userId: childId, balance: BigInt(0) },
-    });
+    throw Object.assign(new Error('Child wallet not found'), { statusCode: 404 });
   }
 
-  // Transfer from parent to child
+  const childUser = await prisma.user.findUnique({ where: { id: child.childUserId }, select: { name: true } });
+
   await prisma.$transaction([
     prisma.wallet.update({
       where: { id: parentWallet.id },
@@ -105,13 +222,13 @@ export async function topupChild(parentId: string, childId: string, amount: numb
         type: 'CHARGE',
         amount: BigInt(amount),
         status: 'SUCCESS',
-        description: `Topup for child: ${child.childName}`,
+        description: `Topup for child: ${childUser?.name ?? 'Unknown'}`,
       },
     }),
   ]);
 
   return {
-    message: `Rp${amount.toLocaleString()} transferred to ${child.childName}`,
+    message: `Rp${amount.toLocaleString()} transferred to ${childUser?.name ?? 'child'}`,
     amount,
   };
 }
@@ -130,8 +247,7 @@ export async function getChildOrders(parentId: string, childId: string, page: nu
   const [orders, total] = await Promise.all([
     prisma.order.findMany({
       where: {
-        orderedById: parentId,
-        studentId: parentId,
+        studentId: child.childUserId,
       },
       include: {
         teacher: {
@@ -144,8 +260,7 @@ export async function getChildOrders(parentId: string, childId: string, page: nu
     }),
     prisma.order.count({
       where: {
-        orderedById: parentId,
-        studentId: parentId,
+        studentId: child.childUserId,
       },
     }),
   ]);

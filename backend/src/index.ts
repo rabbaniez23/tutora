@@ -1,3 +1,9 @@
+// Fix: BigInt cannot be serialized by JSON.stringify natively.
+// This patch converts all BigInt values to strings in JSON responses.
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
+
 import { env } from '@/config/env';
 import { buildApp } from './app';
 
