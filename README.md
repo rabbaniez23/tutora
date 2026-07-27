@@ -601,4 +601,4 @@ import Button from '@/src/components/ui/Button';
 
 ---
 
-*Dokumen ini dibuat berdasarkan analisis kode sumber yang ada pada tanggal April 2026. Perbarui dokumen ini setiap kali ada penambahan fitur baru.*
+*Dokumen ini dibuat berdasarkan analisis kode sumber yang ada pada tanggal Juli 2026. Perbarui dokumen ini setiap kali ada penambahan fitur baru.*
