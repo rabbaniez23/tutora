@@ -195,6 +195,7 @@ export async function getActiveOrder(userId: string) {
       teacher: {
         select: { id: true, name: true, phone: true, avatarUrl: true },
       },
+      sessions: true,
     },
     orderBy: { createdAt: 'desc' },
   });

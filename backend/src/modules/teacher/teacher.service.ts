@@ -88,6 +88,7 @@ export async function listTeachers(filters: ListTeachersInput) {
             ))
           )
         ) <= ${radiusM}::float
+        AND (${subject ?? null}::text IS NULL OR ${subject ?? null}::text = ANY(tp.subjects))
       ORDER BY distance_m ASC
       LIMIT ${limit} OFFSET ${offset}
     `;

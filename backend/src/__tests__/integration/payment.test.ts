@@ -40,6 +40,16 @@ describe('Payment Module', () => {
 
   describe('POST /payments/withdraw', () => {
     it('should request withdrawal', async () => {
+      // Topup teacher wallet first
+      const { prisma } = await import('@/config/database');
+      const teacherUser = await prisma.user.findFirst({ where: { email: 'budi.santoso@gmail.com' } });
+      if (teacherUser) {
+        await prisma.wallet.update({
+          where: { userId: teacherUser.id },
+          data: { balance: 500000n }
+        });
+      }
+
       const res = await app.inject({
         method: 'POST', url: '/payments/withdraw',
         headers: authHeader(teacherToken),

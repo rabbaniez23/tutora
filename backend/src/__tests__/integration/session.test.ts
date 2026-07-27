@@ -21,18 +21,37 @@ afterAll(async () => { await closeTestApp(); });
 
 describe('Session Module', () => {
   beforeAll(async () => {
+    // Topup student wallet balance to ensure sufficient funds for order creation
+    const { prisma } = await import('@/config/database');
+    const studentUser = await prisma.user.findFirst({ where: { email: 'rizky.f@gmail.com' } });
+    if (studentUser) {
+      await prisma.wallet.update({
+        where: { userId: studentUser.id },
+        data: { balance: 500000n }
+      });
+    }
+
+    // Set teacher location to match order coordinates for geofence
+    const teacherUser = await prisma.user.findFirst({ where: { email: 'rina.marlina@gmail.com' } });
+    if (teacherUser) {
+      await prisma.teacherProfile.update({
+        where: { id: teacherUser.id },
+        data: { latitude: -6.2150, longitude: 106.8300 }
+      });
+    }
+
     // 1. Create order
     let res = await app.inject({
       method: 'POST', url: '/orders',
       headers: authHeader(studentToken),
       payload: {
         subject: 'Kimia', level: 'SMA', durationHours: 1, sessionsTotal: 1,
-        // Using Rina's coordinates so distance is 0 for geo-fence check
         latitude: -6.2150, longitude: 106.8300, addressText: 'Test Address', scheduleType: 'NOW'
       },
     });
+    if (res.statusCode >= 400) console.log('POST /orders in session test failed:', res.statusCode, res.body);
     const orderBody = JSON.parse(res.body);
-    orderId = orderBody.data.id;
+    orderId = orderBody.data?.id;
 
     // 2. Accept order
     const { redis } = await import('@/config/redis');
@@ -41,14 +60,12 @@ describe('Session Module', () => {
       method: 'POST', url: `/orders/${orderId}/accept`,
       headers: authHeader(teacherToken),
     });
+    if (res.statusCode >= 400) console.log('POST /orders/accept in session test failed:', res.statusCode, res.body);
 
-    // 3. Get session ID from active order
-    res = await app.inject({
-      method: 'GET', url: '/orders/active',
-      headers: authHeader(studentToken),
-    });
-    const activeOrderBody = JSON.parse(res.body);
-    sessionId = activeOrderBody.data.sessions[0].id;
+    // 3. Get session ID directly from database for this specific order
+    const sessionRecord = await prisma.session.findFirst({ where: { orderId } });
+    sessionId = sessionRecord!.id;
+    console.log('Setup finished. orderId:', orderId, 'sessionId:', sessionId);
   });
 
   describe('POST /sessions/:id/start', () => {
@@ -57,6 +74,7 @@ describe('Session Module', () => {
         method: 'POST', url: `/sessions/${sessionId}/start`,
         headers: authHeader(teacherToken),
       });
+      if (res.statusCode >= 400) console.log('startSession failed:', res.statusCode, res.body);
       expect(res.statusCode).toBe(200);
       const body = JSON.parse(res.body);
       expect(body.data.startedAt).toBeDefined();
