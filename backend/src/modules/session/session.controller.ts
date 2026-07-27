@@ -117,6 +117,13 @@ export async function triggerSosHandler(
     select: { id: true, role: true },
   });
 
+  const { send: sendNotification } = await import('@/modules/notification/notification.service');
+  const triggerUser = await prisma.user.findUnique({
+    where: { id: request.user.id },
+    select: { name: true },
+  });
+  const triggerName = triggerUser?.name || 'Seseorang';
+
   if (orderedByUser?.role === 'PARENT') {
     emitToUser(orderedByUser.id, 'sos_alert', {
       sessionId,
@@ -124,6 +131,14 @@ export async function triggerSosHandler(
       latitude,
       longitude,
     });
+
+    sendNotification(
+      orderedByUser.id,
+      'SOS_ALERT',
+      'DARURAT: Sinyal SOS Aktif!',
+      `Sinyal SOS diaktifkan oleh ${triggerName} selama sesi les berlangsung.`,
+      { sessionId, latitude: String(latitude), longitude: String(longitude) },
+    ).catch((err) => console.error('[NOTIFICATION] Failed to notify parent via DB:', err));
   }
 
   // Notify admin
@@ -139,6 +154,14 @@ export async function triggerSosHandler(
       latitude,
       longitude,
     });
+
+    sendNotification(
+      admin.id,
+      'SOS_ALERT',
+      'DARURAT: Peringatan SOS Baru',
+      `Sinyal SOS diaktifkan oleh ${triggerName} pada koordinat (${latitude}, ${longitude}).`,
+      { sessionId, latitude: String(latitude), longitude: String(longitude) },
+    ).catch((err) => console.error('[NOTIFICATION] Failed to notify admin via DB:', err));
   }
 
   return {

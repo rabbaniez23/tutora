@@ -227,6 +227,15 @@ export async function topupChild(parentId: string, childId: string, amount: numb
     }),
   ]);
 
+  // Send notification to child
+  const { send: sendNotification } = await import('@/modules/notification/notification.service');
+  sendNotification(
+    child.childUserId,
+    'PAYMENT_SUCCESS',
+    'Topup Saldo Berhasil',
+    `Orang tua Anda telah mengirimkan saldo sebesar Rp${amount.toLocaleString()} ke dompet Anda.`,
+  ).catch((err) => console.error('[NOTIFICATION] Failed to send topup notification:', err));
+
   return {
     message: `Rp${amount.toLocaleString()} transferred to ${childUser?.name ?? 'child'}`,
     amount,

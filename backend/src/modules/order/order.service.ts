@@ -306,6 +306,34 @@ export async function acceptOrder(teacherId: string, orderId: string) {
   ]);
 
   // TODO: Notify student via Socket.IO / FCM
+  const teacher = await prisma.user.findUnique({
+    where: { id: teacherId },
+    select: { name: true },
+  });
+
+  const { send: sendNotification } = await import('@/modules/notification/notification.service');
+  const teacherName = teacher?.name || 'Tutor';
+
+  // Notify Student
+  sendNotification(
+    order.studentId,
+    'ORDER_ACCEPTED',
+    'Pesanan Diterima',
+    `Pesanan belajar Anda (${order.subject}) telah diterima oleh tutor ${teacherName}.`,
+    { orderId },
+  ).catch((err) => console.error('[NOTIFICATION] Failed to notify student:', err));
+
+  // Notify Parent if different
+  if (order.orderedById !== order.studentId) {
+    sendNotification(
+      order.orderedById,
+      'ORDER_ACCEPTED',
+      'Pesanan Anak Diterima',
+      `Pesanan belajar anak Anda (${order.subject}) telah diterima oleh tutor ${teacherName}.`,
+      { orderId },
+    ).catch((err) => console.error('[NOTIFICATION] Failed to notify parent:', err));
+  }
+
   console.log(`[ORDER] Tutor ${teacherId} accepted order ${orderId}`);
 
   return updatedOrder;

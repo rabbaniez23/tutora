@@ -60,6 +60,34 @@ export async function startSession(teacherId: string, sessionId: string) {
     }),
   ]);
 
+  // Send notifications
+  const teacher = await prisma.user.findUnique({
+    where: { id: teacherId },
+    select: { name: true },
+  });
+  const teacherName = teacher?.name || 'Tutor';
+
+  const { send: sendNotification } = await import('@/modules/notification/notification.service');
+  // Notify Student
+  sendNotification(
+    session.order.studentId,
+    'SESSION_STARTED',
+    'Sesi Belajar Dimulai',
+    `Sesi belajar Anda (${session.order.subject}) dengan tutor ${teacherName} telah dimulai.`,
+    { sessionId, orderId: session.orderId },
+  ).catch((err) => console.error('[NOTIFICATION] Failed to notify student:', err));
+
+  // Notify Parent if different
+  if (session.order.orderedById !== session.order.studentId) {
+    sendNotification(
+      session.order.orderedById,
+      'SESSION_STARTED',
+      'Sesi Belajar Anak Dimulai',
+      `Sesi belajar anak Anda (${session.order.subject}) dengan tutor ${teacherName} telah dimulai.`,
+      { sessionId, orderId: session.orderId },
+    ).catch((err) => console.error('[NOTIFICATION] Failed to notify parent:', err));
+  }
+
   return updatedSession;
 }
 
@@ -95,6 +123,34 @@ export async function endSession(teacherId: string, sessionId: string) {
       data: { status: 'DONE' },
     }),
   ]);
+
+  // Send notifications
+  const teacher = await prisma.user.findUnique({
+    where: { id: teacherId },
+    select: { name: true },
+  });
+  const teacherName = teacher?.name || 'Tutor';
+
+  const { send: sendNotification } = await import('@/modules/notification/notification.service');
+  // Notify Student
+  sendNotification(
+    session.order.studentId,
+    'SESSION_ENDED',
+    'Sesi Belajar Selesai',
+    `Sesi belajar Anda (${session.order.subject}) dengan tutor ${teacherName} telah selesai.`,
+    { sessionId, orderId: session.orderId },
+  ).catch((err) => console.error('[NOTIFICATION] Failed to notify student:', err));
+
+  // Notify Parent if different
+  if (session.order.orderedById !== session.order.studentId) {
+    sendNotification(
+      session.order.orderedById,
+      'SESSION_ENDED',
+      'Sesi Belajar Anak Selesai',
+      `Sesi belajar anak Anda (${session.order.subject}) dengan tutor ${teacherName} telah selesai.`,
+      { sessionId, orderId: session.orderId },
+    ).catch((err) => console.error('[NOTIFICATION] Failed to notify parent:', err));
+  }
 
   return updatedSession;
 }
@@ -143,6 +199,34 @@ export async function submitReport(
 
   // Trigger escrow release
   await releaseFunds(session.orderId, session.order.finalPrice, teacherId);
+
+  // Send notifications
+  const teacher = await prisma.user.findUnique({
+    where: { id: teacherId },
+    select: { name: true },
+  });
+  const teacherName = teacher?.name || 'Tutor';
+
+  const { send: sendNotification } = await import('@/modules/notification/notification.service');
+  // Notify Student
+  sendNotification(
+    session.order.studentId,
+    'REPORT_SUBMITTED',
+    'Laporan Belajar Baru',
+    `Tutor ${teacherName} telah mengirimkan laporan belajar untuk sesi ${session.order.subject}.`,
+    { sessionId, orderId: session.orderId },
+  ).catch((err) => console.error('[NOTIFICATION] Failed to notify student:', err));
+
+  // Notify Parent if different
+  if (session.order.orderedById !== session.order.studentId) {
+    sendNotification(
+      session.order.orderedById,
+      'REPORT_SUBMITTED',
+      'Laporan Belajar Anak',
+      `Tutor ${teacherName} telah mengirimkan laporan belajar anak Anda untuk sesi ${session.order.subject}.`,
+      { sessionId, orderId: session.orderId },
+    ).catch((err) => console.error('[NOTIFICATION] Failed to notify parent:', err));
+  }
 
   return report;
 }
